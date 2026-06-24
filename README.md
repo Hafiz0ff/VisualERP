@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%200%20complete-1f6feb?style=for-the-badge" alt="Phase 0 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%201%20complete-1f6feb?style=for-the-badge" alt="Phase 1 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -136,12 +136,13 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 0 |
-| Architecture direction | Defined |
+| Product documentation | Complete for Phase 1 |
+| Architecture direction | Defined and aligned with the domain model |
+| Domain model | Complete |
 | Backend implementation | Not started |
 | Final database schema | Not started |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 1 - Domain Model |
+| Next recommended phase | Phase 2 - Database Schema |
 
 ## Planned Tech Direction
 
@@ -155,7 +156,7 @@ The repository is currently documentation-first. The planned implementation dire
 - Validation: Zod
 - Testing: unit, integration, API, permission, audit, and business-flow coverage
 
-Framework-level decisions can be finalized in the next phases once the domain model is locked.
+Framework-level decisions can be finalized in the next phases now that the domain model is locked.
 
 ## Repository Map
 
@@ -198,7 +199,9 @@ Supporting instructions:
 - [`CLAUDE.md`](CLAUDE.md)
 - [`CODEX.md`](CODEX.md)
 
-## Phase 0 Deliverable
+## Phase Progress
+
+### Phase 0
 
 Phase 0 established:
 
@@ -216,13 +219,24 @@ It intentionally does **not** include:
 - final database schema;
 - frontend redesign.
 
+### Phase 1
+
+Phase 1 established:
+
+- universal domain model and ubiquitous language;
+- multi-organization and membership concepts;
+- industry profile, terminology, and module configuration concepts;
+- movement-based stock accounting rules;
+- batch traceability, BOM versioning, and document lifecycle rules;
+- conceptual API and security updates aligned with the model.
+
 ## Next Step
 
-**Phase 1 - Domain Model**
+**Phase 2 - Database Schema**
 
-The next phase should refine:
+The next phase should define:
 
-- entity boundaries;
-- invariants and lifecycle states;
-- module ownership;
-- terminology configuration through industry profiles.
+- concrete Prisma or SQL schema;
+- database constraints and indexes;
+- validation structures aligned with the domain model;
+- seed data for roles, permissions, and industry profiles.
