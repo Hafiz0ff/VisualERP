@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%203%20complete-1f6feb?style=for-the-badge" alt="Phase 3 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%204%20complete-1f6feb?style=for-the-badge" alt="Phase 4 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -136,15 +136,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 3 |
+| Product documentation | Complete for Phase 4 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Not started |
+| Backend implementation | MVP Foundation complete (Fastify, Prisma, Zod) |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 4 - Backend MVP Foundation |
+| Next recommended phase | Phase 5 - Transactional Logic & Ledgers |
 
 ## Planned Tech Direction
 
@@ -253,14 +253,23 @@ Phase 3 established:
 - standardized error catalog and permission matrix;
 - idempotency rules for stock-affecting actions.
 
+### Phase 4
+
+Phase 4 established:
+
+- Fastify application shell, UUID request tracking, and centralized error hooks;
+- multi-tenant context extraction scoped to the `X-Organization-Id` header;
+- database-backed idempotency service utilizing `IdempotencyKey` table;
+- Zod pre-validation hook structure;
+- CRUD routes and service queries for the 8 core master data collections.
+
 ## Next Step
 
-**Phase 4 - Backend MVP Foundation**
+**Phase 5 - Transactional Logic & Ledgers**
 
 The next phase should define:
 
-- backend HTTP framework setup;
-- authentication and tenant context middleware;
-- Zod validator middleware;
-- standard error handling;
-- first controller and service skeletons aligned with the API contract.
+- transactional document logic (Purchase Receipts, Transfers, Production Orders, Shipments);
+- non-negative stock balance invariants;
+- dynamic stock balance and batch lifecycle tracking;
+- ledger-level immutable transaction status and reversing movement entries.

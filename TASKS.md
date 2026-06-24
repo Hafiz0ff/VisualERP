@@ -8,12 +8,13 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 1 - Domain Model
 - [x] Phase 2 - Database Schema
 - [x] Phase 3 - API Contract
-- [ ] Phase 4 - Backend MVP
-- [ ] Phase 5 - Frontend Integration
-- [ ] Phase 6 - Reports and Dashboard
-- [ ] Phase 7 - Testing and Hardening
-- [ ] Phase 8 - Deployment
-- [ ] Phase 9 - Industry Profiles
+- [x] Phase 4 - Backend MVP Foundation
+- [ ] Phase 5 - Transactional Logic & Ledgers
+- [ ] Phase 6 - Frontend Integration
+- [ ] Phase 7 - Reports and Dashboard
+- [ ] Phase 8 - Testing and Hardening
+- [ ] Phase 9 - Deployment
+- [ ] Phase 10 - Industry Profiles
 
 ## Phase Notes
 
@@ -88,16 +89,29 @@ Exit criteria:
 
 ---
 
-### Phase 4 - Backend MVP
+### Phase 4 - Backend MVP Foundation
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Set up Fastify framework, UUID-based request tracking, and TypeScript runtime.
+- Added database-backed idempotency service utilizing `IdempotencyKey` model.
+- Developed centralized error handler routing application errors/Zod validation failures into standard API envelopes.
+- Configured multi-tenant organization context scoping via global hooks and the `X-Organization-Id` header.
+- Implemented core CRUD dictionary endpoints for the 8 primary entities: Organizations, Industry Profiles, Units, Item Categories, Items, Locations, Suppliers, and Customers.
+
+---
+
+### Phase 5 - Transactional Logic & Ledgers
 
 Status: next recommended task.
 
 Planned outcomes:
-- Initialize HTTP backend framework (Express/Next.js).
-- Implement auth middlewares and tenant context scoping checks.
-- Set up Zod input validator middleware and error handling transforms.
-- Connect Prisma and apply migrations to a live PostgreSQL container to test `prisma/seed.ts`.
-- Write core route controllers for Items, Stock Balances, and Receipts.
+- Implement transactional document routes and services: Purchase Receipts, location-to-location Transfers, Production Orders (with Material Consumption and Finished Goods Output), and Shipments.
+- Implement write-off transactions and physical inventory count audits.
+- Enforce non-negative stock balance invariants at transaction boundaries.
+- Calculate dynamic per-location stock balances and batch lifecycle tracking.
+- Implement ledger-level immutability blocks for posted transactions.
 
 ---
 

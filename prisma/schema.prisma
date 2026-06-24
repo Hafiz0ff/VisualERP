@@ -147,6 +147,7 @@ model Organization {
   writeOffs          WriteOff[]
   inventoryAudits    InventoryAudit[]
   auditLogs          AuditLog[]
+  idempotencyKeys    IdempotencyKey[]
 
   @@index([isActive])
 }
@@ -969,4 +970,24 @@ model AuditLog {
   @@index([userId])
   @@index([entityType, entityId])
   @@index([timestamp])
+}
+
+model IdempotencyKey {
+  id             String   @id @default(uuid())
+  organizationId String
+  key            String
+  method         String
+  path           String
+  requestHash    String
+  responseStatus Int?
+  responseBody   Json?
+  status         String
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
+  @@index([expiresAt])
 }

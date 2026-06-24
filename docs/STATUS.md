@@ -6,7 +6,8 @@
 - **Phase 1 (Domain Model)**: Completed on 2026-06-25.
 - **Phase 2 (Database Schema)**: Completed on 2026-06-25.
 - **Phase 3 (API Contract)**: Completed on 2026-06-25. Established REST API specifications (`API-CONTRACT.md`), standardized error code envelopes (`API-ERRORS.md`), role permission scopes (`API-PERMISSIONS.md`), and aligned testing/development guidelines.
-- **Backend/API/Frontend**: No business logic controllers, authentication middleware, or frontend widget changes have started. The frontend prototype remains archived in `ERP-прототип.zip`.
+- **Phase 4 (Backend MVP Foundation)**: Completed on 2026-06-25. Implemented Fastify server, database-backed idempotency service, centralized error handler, tenant scoping via request context, audit/permission placeholders, Zod validation hooks, and core CRUD dictionary endpoints for Organizations, Industry Profiles, Units, Item Categories, Items, Locations, Suppliers, and Customers.
+- **Backend/API/Frontend**: Backend core foundation and CRUD dictionary endpoints are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
 
 ## Current Product Direction
 
@@ -16,11 +17,11 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 4 — Backend MVP Foundation**
+Next recommended task: **Phase 5 — Transactional Logic & Ledgers**
 
-Phase 4 will cover:
-- Initializing the backend HTTP framework (e.g. Express/Next.js).
-- Implementing authentication middleware and request session parsing (fetching tenant context).
-- Implementing the global Zod validation controller middleware.
-- Setting up the error handling middleware transforming exceptions into standard JSON error shapes.
-- Creating the core database service layers and applying migrations to verify the seed script against a live database.
+Phase 5 will cover:
+- Implementing core business transactions: Purchase Receipts, location-to-location Transfers, Production Orders with Material Consumption and Finished Goods Output, and Shipments.
+- Implementing write-off transactions and physical inventory count audits.
+- Enforcing non-negative stock balance invariants at transaction boundaries.
+- Calculating dynamic per-location stock balances and batch lifecycle tracking.
+- Implementing ledger-level immutability blocks for posted transactions.

@@ -23,6 +23,7 @@ Key conventions:
 - **User / UserOrganizationMembership / Role / Permission / RolePermission**: Defines a multi-to-multi relation mapping users to organizations with scoped, granular roles and authorization permissions.
 - **TerminologyConfig**: Allows a tenant to translate core names (e.g. mapping `BOM` -> "Рецептура" or "Состав изделия") dynamically in the client application.
 - **ModuleConfig**: Connects modules (WAREHOUSE, PRODUCTION, BOM, etc.) to a tenant, allowing instant toggling without modifying database rows.
+- **IdempotencyKey**: Database table storing request hashes and response cache data linked to `Organization` to support API mutation deduplication.
 
 ### 2.2 Items & Units (Master Data)
 - **Item**: Core product, material, or component card. Includes `itemType` enum (`MATERIAL`, `COMPONENT`, `PACKAGING`, `SEMI_FINISHED`, `FINISHED_PRODUCT`, `SERVICE`, `CONSUMABLE`).
@@ -88,4 +89,3 @@ The following capabilities are excluded from Phase 2 and will be implemented in 
 1. **Foreign Key Database Level Constraints for Terminology Override**: Localizations are dynamically resolved inside services and not hardcoded into PostgreSQL schemas.
 2. **Database View for Stock Summary**: A materialized view or PostgreSQL database view representing pre-calculated stock balances is deferred to Phase 6 (Reports).
 3. **Database-level Quality Control Triggers**: Automatic expiration status transitions (e.g. marking batches `EXPIRED` automatically when current date exceeds `expirationDate`) are deferred to automated cron job designs in later phases.
-4. **Idempotency Key Persistence**: Phase 3 requires idempotency for stock-affecting actions. Phase 2 intentionally does not add an idempotency table yet; Phase 4 must choose a durable shared store, either a relational table or a persistence-backed Redis deployment. In-memory storage is not acceptable for production.
