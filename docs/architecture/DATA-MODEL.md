@@ -1,5 +1,7 @@
 # Conceptual Data Model
 
+Phase 2 note: the initial PostgreSQL/Prisma schema now exists. This document remains the conceptual source of truth, while concrete table and relation details live in [DATABASE-SCHEMA.md](DATABASE-SCHEMA.md) and `prisma/schema.prisma`.
+
 This document defines the conceptual data model for VisualERP. It serves as the primary specification for the database schema (Prisma/SQL) and API contracts in subsequent phases.
 
 All core entities are designed to be **universal and industry-agnostic**. Terminology changes (e.g. using "Рецептура" instead of "BOM" or "Цех" instead of "Workshop") are handled dynamically via the configuration layer, without altering the core database structure or code logic.

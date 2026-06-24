@@ -25,12 +25,16 @@ Use integration tests for:
 
 ### API Tests
 
-Use API tests for:
+API testing must verify route behavior, input sanitization, and security guard stability:
+- **Contract Verification Tests**: Ensure success and paginated list response payloads conform to the standard envelopes (`data`, `pagination`, `meta`), and that fields match the conceptual DTO specifications.
+- **Request Validation Tests**: Verify that Zod schemas block invalid payloads (e.g. negative quantities, missing required fields) and return `VALIDATION_ERROR` (HTTP 400) with a list of invalid fields in the details array.
+- **Authorization & RBAC Tests**: Verify that request calls from users lacking the required granular permission string (e.g. `purchase_receipts:post`) are blocked with a `FORBIDDEN` (HTTP 403) status.
+- **Multi-Tenancy Isolation Tests**: Ensure that route requests scope queries to the authenticated user's organization. Simulate cross-tenant reference attacks (e.g., trying to read an item ID belonging to tenant B while logged into tenant A) to verify that the API returns `ORGANIZATION_SCOPE_VIOLATION` (HTTP 403).
+- **Idempotency Key Tests**:
+  - Test sending identical `Idempotency-Key` headers for duplicate requests. Verify that the second request returns the cached response without running domain logic twice.
+  - Test sending the same key with different payloads. Verify that the server returns `IDEMPOTENCY_CONFLICT` (HTTP 409).
+- **Lifecycle Action Tests**: Verify that critical document status changes are rejected through generic `PATCH` payloads and accepted only through explicit action endpoints such as `/post`, `/ship`, `/complete`, `/approve`, and `/cancel`.
 
-- request validation;
-- response contract stability;
-- authorization behavior;
-- error shape consistency.
 
 ### Business Flow Tests
 

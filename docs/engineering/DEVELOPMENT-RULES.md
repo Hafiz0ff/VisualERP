@@ -52,23 +52,34 @@ These rules govern the development, database design, and backend implementation 
 
 ---
 
-## 4. Input Validation & Domain Invariants
+## 4. API Implementation Rules
 
-- **Boundary Validation**: Validate all inputs at the API controller boundaries before they reach domain services. Use **Zod** schema validations.
-- **Non-Negative Invariant**: The calculated stock balance for any `Item` inside a `StockLocation` for a specific `StockBatch` should not fall below zero (except where explicitly allowed by temporary configurations).
+- **Explicit Lifecycle Routing**: Document transitions (like posting or cancellation) must never be performed via general PATCH updates. Use explicit POST action routes (e.g., `/api/purchase-receipts/:id/post` or `/api/purchase-receipts/:id/cancel`).
+- **Posted Immutability**: The API controllers and service layers must block any updates (PUT/PATCH/DELETE) targeting a document with a status of `POSTED` or `CANCELLED`.
+- **Shipment Lifecycle Naming**: Shipment execution uses `SHIPPED` status and `/ship` action endpoints. Do not model shipments as generic `/post` actions in API code.
+- **Zod Validation**: All API request payloads must be strictly validated at the controller boundary using Zod schemas before being passed to domain logic.
+- **Granular Permission Guards**: Every endpoint must be guarded by an authorization middleware that checks if the active user's role contains the required granular permission string (`module:action`) specified in the permissions matrix.
+- **Multi-Tenant Context Scoping**: The API must verify the tenant context (`X-Organization-Id` or session-bound organization) for every request. Any query referencing items, locations, or documents must ensure they match the active organization. Scoping violations must return `403 Forbidden` (code `ORGANIZATION_SCOPE_VIOLATION`).
+
+---
+
+## 5. Input Validation & Domain Invariants
+
+- **Boundary Validation**: Validate all inputs at the API controller boundaries before they reach domain services. Use Zod schemas matching the database structures.
+- **Non-Negative Invariant**: The calculated stock balance for any `Item` inside a `StockLocation` for a specific `StockBatch` should not fall below zero. Validate stock availability before posting any stock-reduction documents.
 - **Unit Matching**: Ensure that transaction units match the base unit of the item, or verify that a valid `UnitConversion` mapping exists.
 - **Tenant-Membership Invariant**: `organizationId` selection from headers or route params must be validated against `UserOrganizationMembership` before processing any action.
 
 ---
 
-## 5. Security & Auditing
+## 6. Security & Auditing
 
 - **Scoping to Tenant**: Every database query that interacts with business data must explicitly filter by `organizationId`. Failing to include `organizationId` is a critical security vulnerability.
 - **Audit Logging**: Any write operation that updates user permissions, alters system configurations, or transitions documents to `Posted` or `Cancelled` states must write an entry to `AuditLog` within the same database transaction.
 
 ---
 
-## 6. Testing Strategy
+## 7. Testing Strategy
 
 - **Domain-Logic Isolation**: Write unit tests for domain services (e.g., calculating unit conversions, evaluating BOM waste factors) without mocking the database if possible, or using in-memory databases.
 - **Transaction Verification**: Write integration tests that verify rollbacks occur when bad data is supplied in stock-affecting flows.

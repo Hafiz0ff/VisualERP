@@ -1,0 +1,972 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ====================================================
+// ENUMS
+// ====================================================
+
+enum ItemType {
+  MATERIAL
+  COMPONENT
+  PACKAGING
+  SEMI_FINISHED
+  FINISHED_PRODUCT
+  SERVICE
+  CONSUMABLE
+}
+
+enum LocationType {
+  WAREHOUSE
+  WORKSHOP
+  PRODUCTION_AREA
+  RETAIL_POINT
+  VIRTUAL
+}
+
+enum DocumentStatus {
+  DRAFT
+  POSTED
+  CANCELLED
+}
+
+enum MovementType {
+  PURCHASE_RECEIPT
+  TRANSFER
+  PRODUCTION_CONSUMPTION
+  PRODUCTION_OUTPUT
+  SHIPMENT
+  WRITE_OFF
+  INVENTORY_ADJUSTMENT
+  RETURN
+  CANCELLATION
+}
+
+enum MovementStatus {
+  DRAFT
+  POSTED
+  CANCELLED
+}
+
+enum ProductionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ShipmentStatus {
+  DRAFT
+  SHIPPED
+  CANCELLED
+}
+
+enum InventoryAuditStatus {
+  DRAFT
+  COUNTED
+  APPROVED
+  CANCELLED
+}
+
+enum WriteOffReason {
+  TECHNOLOGICAL_LOSS
+  DEFECT
+  DAMAGE
+  INVENTORY_CORRECTION
+  SAMPLE
+  OTHER
+}
+
+enum BatchStatus {
+  QUARANTINE
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ModuleKey {
+  WAREHOUSE
+  PRODUCTION
+  BOM
+  SHIPMENTS
+  WRITEOFFS
+  REPORTS
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  POST
+  CANCEL
+  MANAGE
+}
+
+// ====================================================
+// MODELS
+// ====================================================
+
+model Organization {
+  id           String   @id @default(uuid())
+  name         String
+  industryProfileCode String?
+  baseCurrency String   @default("USD")
+  locale       String   @default("en-US")
+  timezone     String   @default("UTC")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  industryProfile    IndustryProfile?             @relation(fields: [industryProfileCode], references: [code], onDelete: SetNull)
+  memberships        UserOrganizationMembership[]
+  roles              Role[]
+  moduleConfigs      ModuleConfig[]
+  terminologyConfigs TerminologyConfig[]
+  itemCategories     ItemCategory[]
+  items              Item[]
+  units              Unit[]
+  unitConversions    UnitConversion[]
+  stockLocations     StockLocation[]
+  stockBatches       StockBatch[]
+  stockMovements     StockMovement[]
+  suppliers          Supplier[]
+  customers          Customer[]
+  purchaseReceipts   PurchaseReceipt[]
+  transfers          Transfer[]
+  boms               BOM[]
+  productionOrders   ProductionOrder[]
+  consumptions       ProductionConsumption[]
+  outputs            FinishedGoodsOutput[]
+  shipments          Shipment[]
+  writeOffs          WriteOff[]
+  inventoryAudits    InventoryAudit[]
+  auditLogs          AuditLog[]
+
+  @@index([isActive])
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships UserOrganizationMembership[]
+  auditLogs   AuditLog[]
+  createdStockMovements StockMovement[] @relation("StockMovementCreatedBy")
+  postedStockMovements  StockMovement[] @relation("StockMovementPostedBy")
+  createdPurchaseReceipts PurchaseReceipt[] @relation("PurchaseReceiptCreatedBy")
+  createdTransfers      Transfer[]      @relation("TransferCreatedBy")
+  createdBoms           BOM[]           @relation("BOMCreatedBy")
+  createdProductionOrders ProductionOrder[] @relation("ProductionOrderCreatedBy")
+  productionConsumptions ProductionConsumption[] @relation("ProductionConsumptionBy")
+  finishedGoodsOutputs FinishedGoodsOutput[] @relation("FinishedGoodsOutputBy")
+  createdShipments     Shipment[]      @relation("ShipmentCreatedBy")
+  responsibleWriteOffs WriteOff[]      @relation("WriteOffResponsibleUser")
+  inventoryAudits      InventoryAudit[] @relation("InventoryAuditAuditor")
+
+  @@index([email])
+  @@index([isActive])
+}
+
+model Role {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  isSystem       Boolean  @default(false)
+  organizationId String? // Null for global predefined system roles
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  memberships  UserOrganizationMembership[]
+  permissions  RolePermission[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  code        String   @unique // e.g., "warehouse:receipts:create"
+  description String?
+  module      String // e.g., "warehouse"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+
+  @@index([code])
+}
+
+model UserOrganizationMembership {
+  id             String   @id @default(uuid())
+  userId         String
+  organizationId String
+  roleId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model RolePermission {
+  id           String   @id @default(uuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model IndustryProfile {
+  code              String   @id
+  name              String
+  description       String?
+  defaultCategories String[]
+  defaultModules    ModuleKey[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organizations     Organization[]
+}
+
+model ModuleConfig {
+  id             String    @id @default(uuid())
+  organizationId String
+  moduleKey      ModuleKey
+  isEnabled      Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, moduleKey])
+  @@index([organizationId])
+}
+
+model TerminologyConfig {
+  id             String   @id @default(uuid())
+  organizationId String
+  key            String // e.g., "BOM", "Warehouse", "Workshop"
+  labelDefault   String
+  labelCustom    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
+}
+
+model ItemCategory {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  parentId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent       ItemCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     ItemCategory[] @relation("CategoryHierarchy")
+  items        Item[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@index([parentId])
+}
+
+model Unit {
+  id             String   @id @default(uuid())
+  organizationId String? // Null if global base unit
+  symbol         String
+  name           String
+  isBaseUnit     Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  items                 Item[]
+  conversionsFrom       UnitConversion[]        @relation("ConversionsFrom")
+  conversionsTo         UnitConversion[]        @relation("ConversionsTo")
+  stockBatches          StockBatch[]
+  stockMovementLines    StockMovementLine[]
+  purchaseReceiptLines  PurchaseReceiptLine[]
+  transferLines         TransferLine[]
+  bomLines              BOMLine[]
+  productionOrders      ProductionOrder[]       @relation("TargetUnit")
+  productionOrderLines  ProductionOrderLine[]
+  productionConsumptions ProductionConsumption[]
+  finishedGoodsOutputs  FinishedGoodsOutput[]
+  shipmentLines         ShipmentLine[]
+  writeOffLines         WriteOffLine[]
+  inventoryAuditLines   InventoryAuditLine[]
+
+  @@unique([organizationId, symbol])
+  @@index([organizationId])
+}
+
+model UnitConversion {
+  id             String   @id @default(uuid())
+  organizationId String
+  fromUnitId     String
+  toUnitId       String
+  factor         Decimal  @db.Decimal(18, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  fromUnit     Unit         @relation("ConversionsFrom", fields: [fromUnitId], references: [id], onDelete: Cascade)
+  toUnit       Unit         @relation("ConversionsTo", fields: [toUnitId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, fromUnitId, toUnitId])
+  @@index([organizationId])
+}
+
+model Item {
+  id             String   @id @default(uuid())
+  organizationId String
+  categoryId     String?
+  name           String
+  code           String?
+  sku            String?
+  description    String?
+  unitId         String
+  itemType       ItemType
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category     ItemCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  unit         Unit          @relation(fields: [unitId], references: [id])
+
+  stockBatches          StockBatch[]
+  stockMovementLines    StockMovementLine[]
+  purchaseReceiptLines  PurchaseReceiptLine[]
+  transferLines         TransferLine[]
+  bomLines              BOMLine[]
+  productionOrders      ProductionOrder[]
+  productionOrderLines  ProductionOrderLine[]
+  productionConsumptions ProductionConsumption[]
+  finishedGoodsOutputs  FinishedGoodsOutput[]
+  shipmentLines         ShipmentLine[]
+  writeOffLines         WriteOffLine[]
+  inventoryAuditLines   InventoryAuditLine[]
+  boms                  BOM[]
+
+  @@unique([organizationId, sku])
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([categoryId])
+  @@index([unitId])
+  @@index([isActive])
+}
+
+model StockLocation {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  code           String
+  description    String?
+  type           LocationType
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  stockBatches          StockBatch[]
+  stockMovementLinesSrc StockMovementLine[]     @relation("MovementSrc")
+  stockMovementLinesTgt StockMovementLine[]     @relation("MovementTgt")
+  purchaseReceipts      PurchaseReceipt[]
+  transfersSrc          Transfer[]              @relation("TransferSrc")
+  transfersTgt          Transfer[]              @relation("TransferTgt")
+  productionOrders      ProductionOrder[]
+  productionConsumptions ProductionConsumption[]
+  finishedGoodsOutputs  FinishedGoodsOutput[]
+  shipments             Shipment[]
+  writeOffs             WriteOff[]              @relation("WriteOffHeaderLocation")
+  writeOffLines         WriteOffLine[]          @relation("WriteOffLineLocation")
+  inventoryAudits       InventoryAudit[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([type])
+  @@index([isActive])
+}
+
+model StockBatch {
+  id             String      @id @default(uuid())
+  organizationId String
+  itemId         String
+  batchNumber    String
+  unitId         String
+  receivedLocationId String?
+  supplierId     String?
+  receivedDate   DateTime?
+  expirationDate DateTime?
+  costPerUnit    Decimal?    @db.Decimal(18, 6)
+  status         BatchStatus @default(APPROVED)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  item         Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  unit         Unit          @relation(fields: [unitId], references: [id])
+  receivedLocation StockLocation? @relation(fields: [receivedLocationId], references: [id], onDelete: SetNull)
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  stockMovementLines   StockMovementLine[]
+  transferLines        TransferLine[]
+  productionConsumptions ProductionConsumption[]
+  finishedGoodsOutputs FinishedGoodsOutput[]
+  shipmentLines        ShipmentLine[]
+  writeOffLines        WriteOffLine[]
+  inventoryAuditLines  InventoryAuditLine[]
+
+  @@unique([organizationId, itemId, batchNumber])
+  @@index([organizationId])
+  @@index([itemId])
+  @@index([receivedLocationId])
+  @@index([status])
+}
+
+model StockMovement {
+  id                 String         @id @default(uuid())
+  organizationId     String
+  movementNumber     String
+  type               MovementType
+  status             MovementStatus @default(DRAFT)
+  sourceDocumentType String
+  sourceDocumentId   String
+  createdByUserId    String
+  postedByUserId     String?
+  timestamp          DateTime
+  postedAt           DateTime?
+  cancelledAt        DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User                @relation("StockMovementCreatedBy", fields: [createdByUserId], references: [id])
+  postedBy     User?               @relation("StockMovementPostedBy", fields: [postedByUserId], references: [id])
+  lines        StockMovementLine[]
+
+  @@unique([organizationId, movementNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model StockMovementLine {
+  id              String   @id @default(uuid())
+  stockMovementId String
+  itemId          String
+  batchId         String?
+  quantity        Decimal  @db.Decimal(18, 6)
+  unitId          String
+  sourceLocationId String?
+  targetLocationId String?
+  costPerUnit     Decimal? @db.Decimal(18, 6)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  stockMovement StockMovement  @relation(fields: [stockMovementId], references: [id], onDelete: Cascade)
+  item          Item           @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch         StockBatch?    @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit          Unit           @relation(fields: [unitId], references: [id])
+  sourceLocation StockLocation? @relation("MovementSrc", fields: [sourceLocationId], references: [id])
+  targetLocation StockLocation? @relation("MovementTgt", fields: [targetLocationId], references: [id])
+
+  @@index([stockMovementId])
+  @@index([itemId])
+  @@index([batchId])
+  @@index([sourceLocationId])
+  @@index([targetLocationId])
+}
+
+model Supplier {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  code           String?
+  contactInfo    String?
+  taxId          String?
+  notes          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  purchaseReceipts PurchaseReceipt[]
+  stockBatches     StockBatch[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+}
+
+model Customer {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  code           String?
+  contactInfo    String?
+  taxId          String?
+  notes          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  shipments Shipment[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+}
+
+model PurchaseReceipt {
+  id               String         @id @default(uuid())
+  organizationId   String
+  receiptNumber    String
+  supplierId       String?
+  date             DateTime
+  targetLocationId String
+  status           DocumentStatus @default(DRAFT)
+  createdByUserId  String
+  postedAt         DateTime?
+  cancelledAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier       Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  targetLocation StockLocation       @relation(fields: [targetLocationId], references: [id])
+  createdBy      User                @relation("PurchaseReceiptCreatedBy", fields: [createdByUserId], references: [id])
+  lines          PurchaseReceiptLine[]
+
+  @@unique([organizationId, receiptNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([targetLocationId])
+}
+
+model PurchaseReceiptLine {
+  id                String    @id @default(uuid())
+  purchaseReceiptId String
+  itemId            String
+  quantity          Decimal   @db.Decimal(18, 6)
+  unitId            String
+  batchNumber       String
+  expirationDate    DateTime?
+  costPerUnit       Decimal   @db.Decimal(18, 6)
+  totalPrice        Decimal?  @db.Decimal(18, 6)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  purchaseReceipt PurchaseReceipt @relation(fields: [purchaseReceiptId], references: [id], onDelete: Cascade)
+  item            Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  unit            Unit            @relation(fields: [unitId], references: [id])
+
+  @@index([purchaseReceiptId])
+  @@index([itemId])
+}
+
+model Transfer {
+  id               String         @id @default(uuid())
+  organizationId   String
+  transferNumber   String
+  sourceLocationId String
+  targetLocationId String
+  date             DateTime
+  status           DocumentStatus @default(DRAFT)
+  createdByUserId  String
+  postedAt         DateTime?
+  cancelledAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceLocation StockLocation @relation("TransferSrc", fields: [sourceLocationId], references: [id])
+  targetLocation StockLocation @relation("TransferTgt", fields: [targetLocationId], references: [id])
+  createdBy      User          @relation("TransferCreatedBy", fields: [createdByUserId], references: [id])
+  lines          TransferLine[]
+
+  @@unique([organizationId, transferNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([sourceLocationId])
+  @@index([targetLocationId])
+}
+
+model TransferLine {
+  id         String   @id @default(uuid())
+  transferId String
+  itemId     String
+  batchId    String?
+  quantity   Decimal  @db.Decimal(18, 6)
+  unitId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  transfer Transfer    @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  item     Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch    StockBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit     Unit        @relation(fields: [unitId], references: [id])
+
+  @@index([transferId])
+  @@index([itemId])
+  @@index([batchId])
+}
+
+model BOM {
+  id             String   @id @default(uuid())
+  organizationId String
+  outputItemId   String
+  name           String
+  version        String
+  isActive       Boolean  @default(true)
+  createdByUserId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  outputItem   Item         @relation(fields: [outputItemId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("BOMCreatedBy", fields: [createdByUserId], references: [id])
+  lines        BOMLine[]
+  productionOrders ProductionOrder[]
+
+  @@unique([organizationId, outputItemId, version])
+  @@index([organizationId])
+  @@index([outputItemId])
+  @@index([isActive])
+}
+
+model BOMLine {
+  id           String   @id @default(uuid())
+  bomId        String
+  inputItemId  String
+  quantity     Decimal  @db.Decimal(18, 6)
+  unitId       String
+  wastePercent Decimal? @db.Decimal(5, 2)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bom       BOM  @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  inputItem Item @relation(fields: [inputItemId], references: [id], onDelete: Cascade)
+  unit      Unit @relation(fields: [unitId], references: [id])
+
+  @@index([bomId])
+  @@index([inputItemId])
+}
+
+model ProductionOrder {
+  id                 String           @id @default(uuid())
+  organizationId     String
+  orderNumber        String
+  targetItemId       String
+  plannedQuantity    Decimal          @db.Decimal(18, 6)
+  actualQuantity     Decimal?         @db.Decimal(18, 6)
+  targetUnitId       String
+  bomId              String?
+  workshopLocationId String
+  status             ProductionStatus @default(PLANNED)
+  scheduledDate      DateTime
+  actualStartDate    DateTime?
+  actualEndDate      DateTime?
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  createdByUserId    String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  organization     Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  targetItem       Item                    @relation(fields: [targetItemId], references: [id], onDelete: Cascade)
+  targetUnit       Unit                    @relation("TargetUnit", fields: [targetUnitId], references: [id])
+  bom              BOM?                    @relation(fields: [bomId], references: [id], onDelete: SetNull)
+  workshopLocation StockLocation           @relation(fields: [workshopLocationId], references: [id])
+  createdBy        User                    @relation("ProductionOrderCreatedBy", fields: [createdByUserId], references: [id])
+  plannedLines     ProductionOrderLine[]
+  consumptions     ProductionConsumption[]
+  outputs          FinishedGoodsOutput[]
+
+  @@unique([organizationId, orderNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([targetItemId])
+  @@index([workshopLocationId])
+  @@index([createdAt])
+}
+
+model ProductionOrderLine {
+  id                String   @id @default(uuid())
+  productionOrderId String
+  inputItemId       String
+  plannedQuantity   Decimal  @db.Decimal(18, 6)
+  unitId            String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  productionOrder ProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+  inputItem       Item            @relation(fields: [inputItemId], references: [id], onDelete: Cascade)
+  unit            Unit            @relation(fields: [unitId], references: [id])
+
+  @@index([productionOrderId])
+  @@index([inputItemId])
+}
+
+model ProductionConsumption {
+  id                String   @id @default(uuid())
+  organizationId    String
+  productionOrderId String
+  itemId            String
+  batchId           String?
+  quantity          Decimal  @db.Decimal(18, 6)
+  unitId            String
+  sourceLocationId  String
+  consumedByUserId  String
+  timestamp         DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  productionOrder ProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+  item            Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch           StockBatch?     @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit            Unit            @relation(fields: [unitId], references: [id])
+  sourceLocation  StockLocation   @relation(fields: [sourceLocationId], references: [id])
+  consumedBy      User            @relation("ProductionConsumptionBy", fields: [consumedByUserId], references: [id])
+
+  @@index([organizationId])
+  @@index([productionOrderId])
+  @@index([itemId])
+  @@index([batchId])
+}
+
+model FinishedGoodsOutput {
+  id                String   @id @default(uuid())
+  organizationId    String
+  productionOrderId String
+  itemId            String
+  batchId           String?
+  quantity          Decimal  @db.Decimal(18, 6)
+  unitId            String
+  targetLocationId  String
+  costPerUnit       Decimal? @db.Decimal(18, 6)
+  producedByUserId  String
+  timestamp         DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  productionOrder ProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+  item            Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch           StockBatch?     @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit            Unit            @relation(fields: [unitId], references: [id])
+  targetLocation  StockLocation   @relation(fields: [targetLocationId], references: [id])
+  producedBy      User            @relation("FinishedGoodsOutputBy", fields: [producedByUserId], references: [id])
+
+  @@index([organizationId])
+  @@index([productionOrderId])
+  @@index([itemId])
+  @@index([batchId])
+}
+
+model Shipment {
+  id               String         @id @default(uuid())
+  organizationId   String
+  shipmentNumber   String
+  customerId       String?
+  date             DateTime
+  sourceLocationId String
+  status           ShipmentStatus @default(DRAFT)
+  createdByUserId  String
+  shippedAt        DateTime?
+  cancelledAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  sourceLocation StockLocation @relation(fields: [sourceLocationId], references: [id])
+  createdBy      User         @relation("ShipmentCreatedBy", fields: [createdByUserId], references: [id])
+  lines          ShipmentLine[]
+
+  @@unique([organizationId, shipmentNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([sourceLocationId])
+}
+
+model ShipmentLine {
+  id           String   @id @default(uuid())
+  shipmentId   String
+  itemId       String
+  batchId      String?
+  quantity     Decimal  @db.Decimal(18, 6)
+  unitId       String
+  pricePerUnit Decimal? @db.Decimal(18, 6)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shipment Shipment    @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  item     Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch    StockBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit     Unit        @relation(fields: [unitId], references: [id])
+
+  @@index([shipmentId])
+  @@index([itemId])
+  @@index([batchId])
+}
+
+model WriteOff {
+  id                 String         @id @default(uuid())
+  organizationId     String
+  writeOffNumber     String
+  date               DateTime
+  locationId         String
+  reason             WriteOffReason
+  description        String?
+  responsibleUserId  String
+  status             DocumentStatus @default(DRAFT)
+  postedAt           DateTime?
+  cancelledAt        DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location     StockLocation  @relation("WriteOffHeaderLocation", fields: [locationId], references: [id])
+  responsibleUser User        @relation("WriteOffResponsibleUser", fields: [responsibleUserId], references: [id])
+  lines        WriteOffLine[]
+
+  @@unique([organizationId, writeOffNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([locationId])
+}
+
+model WriteOffLine {
+  id         String   @id @default(uuid())
+  writeOffId String
+  itemId     String
+  locationId String
+  batchId    String?
+  quantity   Decimal  @db.Decimal(18, 6)
+  unitId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  writeOff WriteOff    @relation(fields: [writeOffId], references: [id], onDelete: Cascade)
+  item     Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  location StockLocation @relation("WriteOffLineLocation", fields: [locationId], references: [id])
+  batch    StockBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit     Unit        @relation(fields: [unitId], references: [id])
+
+  @@index([writeOffId])
+  @@index([itemId])
+  @@index([locationId])
+  @@index([batchId])
+}
+
+model InventoryAudit {
+  id             String               @id @default(uuid())
+  organizationId String
+  auditNumber    String
+  auditDate      DateTime
+  locationId     String
+  status         InventoryAuditStatus @default(DRAFT)
+  auditorUserId  String
+  countedAt      DateTime?
+  approvedAt     DateTime?
+  cancelledAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location     StockLocation        @relation(fields: [locationId], references: [id])
+  auditor      User                 @relation("InventoryAuditAuditor", fields: [auditorUserId], references: [id])
+  lines        InventoryAuditLine[]
+
+  @@unique([organizationId, auditNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([locationId])
+}
+
+model InventoryAuditLine {
+  id                 String   @id @default(uuid())
+  inventoryAuditId   String
+  itemId             String
+  batchId            String?
+  expectedQuantity   Decimal  @db.Decimal(18, 6)
+  actualQuantity     Decimal  @db.Decimal(18, 6)
+  discrepancyQuantity Decimal  @db.Decimal(18, 6)
+  unitId             String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  inventoryAudit InventoryAudit @relation(fields: [inventoryAuditId], references: [id], onDelete: Cascade)
+  item           Item           @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  batch          StockBatch?    @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  unit           Unit           @relation(fields: [unitId], references: [id])
+
+  @@index([inventoryAuditId])
+  @@index([itemId])
+  @@index([batchId])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  timestamp      DateTime @default(now())
+  action         String
+  entityType     String
+  entityId       String
+  oldValue       Json?
+  newValue       Json?
+  ipAddress      String?
+  userAgent      String?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+}

@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%201%20complete-1f6feb?style=for-the-badge" alt="Phase 1 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%203%20complete-1f6feb?style=for-the-badge" alt="Phase 3 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -136,13 +136,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 1 |
+| Product documentation | Complete for Phase 3 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
+| Database schema foundation | Complete |
+| API contract | Complete |
 | Backend implementation | Not started |
-| Final database schema | Not started |
+| Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 2 - Database Schema |
+| Next recommended phase | Phase 4 - Backend MVP Foundation |
 
 ## Planned Tech Direction
 
@@ -230,13 +232,35 @@ Phase 1 established:
 - batch traceability, BOM versioning, and document lifecycle rules;
 - conceptual API and security updates aligned with the model.
 
+### Phase 2
+
+Phase 2 established:
+
+- initial PostgreSQL + Prisma project tooling;
+- explicit relational schema for organizations, access, catalog, stock, production, shipments, write-offs, audits, and audit log;
+- UUID keys, tenant scoping, enums, indexes, and document lifecycle timestamps;
+- minimal idempotent seed data for the demo organization and dry-mixes profile;
+- database architecture documentation aligned with the domain model.
+
+### Phase 3
+
+Phase 3 established:
+
+- REST API contract overview and endpoint groups;
+- standard success, paginated list, and error envelopes;
+- business document lifecycle action endpoints;
+- conceptual DTOs aligned with the Prisma schema;
+- standardized error catalog and permission matrix;
+- idempotency rules for stock-affecting actions.
+
 ## Next Step
 
-**Phase 2 - Database Schema**
+**Phase 4 - Backend MVP Foundation**
 
 The next phase should define:
 
-- concrete Prisma or SQL schema;
-- database constraints and indexes;
-- validation structures aligned with the domain model;
-- seed data for roles, permissions, and industry profiles.
+- backend HTTP framework setup;
+- authentication and tenant context middleware;
+- Zod validator middleware;
+- standard error handling;
+- first controller and service skeletons aligned with the API contract.

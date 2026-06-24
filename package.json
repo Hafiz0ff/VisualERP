@@ -1,0 +1,27 @@
+{
+  "name": "visual-erp",
+  "version": "1.0.0",
+  "description": "VisualERP - A universal lightweight ERP for small manufacturing businesses.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "prisma": "^5.16.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
