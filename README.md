@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%205%20complete-1f6feb?style=for-the-badge" alt="Phase 5 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%206%20complete-1f6feb?style=for-the-badge" alt="Phase 6 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -26,6 +26,23 @@ The first prototype context is a **dry construction mixes workshop**, but the sy
 - textile;
 - packaging;
 - other small workshops.
+
+## Описание На Русском
+
+**VisualERP** — это лёгкая и наглядная система управления для небольших производственных компаний. Она помогает заменить разрозненные таблицы, ручной учёт и перегруженные старые решения понятным рабочим пространством для склада, производства, списаний, отгрузок и контроля истории операций.
+
+Проект строится как универсальная основа: сначала отрабатывается пример цеха сухих строительных смесей, но внутренняя модель не привязана к одной отрасли. Те же принципы подходят для пищевого производства, молочной продукции, мебели, упаковки, текстиля и других небольших мастерских.
+
+Главная идея VisualERP:
+
+- видеть реальные остатки по складам и партиям;
+- оформлять поступления, перемещения и списания через строгие документы;
+- хранить понятную историю действий;
+- разделять права сотрудников;
+- подстраивать названия и состав разделов под конкретное производство;
+- не допускать расхождения между документами и складскими остатками.
+
+Текущая версия уже содержит основу серверной части и первые рабочие складские документы: поступления, перемещения и списания. Остатки считаются не вручную, а по журналу проведённых движений, поэтому система сохраняет проверяемую историю вместо скрытого изменения чисел.
 
 ## Product Positioning
 
@@ -136,15 +153,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 5 |
+| Product documentation | Complete for Phase 6 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Infrastructure & Domain Services complete |
+| Backend implementation | Business Document Workflows complete |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 6 - Business Document Workflows |
+| Next recommended phase | Phase 7 - Production and Shipment Workflows |
 
 ## Planned Tech Direction
 
@@ -272,14 +289,24 @@ Phase 5 established:
 - dynamic stock ledger calculations, stock availability validation checks, and MANUAL/FIFO/FEFO batch allocation resolvers;
 - synchronous, transaction-safe in-process Event Bus.
 
+### Phase 6
+
+Phase 6 established:
+
+- full REST API CRUD, post, and cancel endpoints for Purchase Receipts, Transfers, and Write-offs;
+- strict document lifecycle state transitions using transactional operations;
+- dynamic stock ledger adjustments and batch allocations;
+- request idempotency hooks;
+- compensating cancellation checks preventing negative stock balances on reversals.
+
 ## Next Step
 
-**Phase 6 - Business Document Workflows**
+**Phase 7 - Production and Shipment Workflows**
 
 The next phase should define:
 
-- posting/cancelling workflows for Purchase Receipts;
-- location-to-location Transfers;
-- Production Order lifecycles with material consumption and outputs;
-- Shipments, Write-offs, and physical Inventory Audits;
-- ledger-level immutable transaction status checks.
+- Bill of Materials (BOM) creation and active-status validation;
+- Production Order workflows and state machines (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED);
+- component consumption (FIFO/FEFO batch allocations) and finished goods output movements;
+- Customer shipment workflows matching sales orders;
+- ledger-level reversing logic and immutability controls.

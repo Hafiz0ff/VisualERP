@@ -37,6 +37,7 @@ API testing must verify route behavior, input sanitization, and security guard s
 - **Idempotency Key Tests**:
   - Test sending identical `Idempotency-Key` headers for duplicate requests. Verify that the second request returns the cached response without running domain logic twice.
   - Test sending the same key with different payloads. Verify that the server returns `IDEMPOTENCY_CONFLICT` (HTTP 409).
+  - Test failed `/post` and `/cancel` attempts. Verify that pending idempotency records are cleared so the same request can be retried after the original error is fixed.
 - **Lifecycle Action Tests**: Verify that critical document status changes are rejected through generic `PATCH` payloads and accepted only through explicit action endpoints such as `/post`, `/ship`, `/complete`, `/approve`, and `/cancel`.
 
 
@@ -46,6 +47,7 @@ Use end-to-end or workflow tests for the core operational cycle:
 
 - purchase receipt;
 - warehouse transfer;
+- write-off posting and cancellation;
 - production order;
 - consumption;
 - finished goods output;

@@ -2,7 +2,7 @@ import Fastify, { FastifyInstance } from 'fastify';
 import { randomUUID } from 'crypto';
 import './shared/api/request-context'; // Load typing overrides
 import { setupErrorHandler } from './shared/errors/error-handler';
-import { UnauthorizedError } from './shared/errors/app-error';
+import { UnauthorizedError, ValidationError } from './shared/errors/app-error';
 
 // Import module routes
 import { healthRoutes } from './modules/health/health.routes';
@@ -14,6 +14,11 @@ import { itemsRoutes } from './modules/items/items.routes';
 import { locationsRoutes } from './modules/locations/locations.routes';
 import { suppliersRoutes } from './modules/suppliers/suppliers.routes';
 import { customersRoutes } from './modules/customers/customers.routes';
+import { purchaseReceiptsRoutes } from './modules/purchase-receipts/purchase-receipts.routes';
+import { transfersRoutes } from './modules/transfers/transfers.routes';
+import { writeOffsRoutes } from './modules/write-offs/write-offs.routes';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function createServer(): FastifyInstance {
   const app = Fastify({
@@ -52,6 +57,12 @@ export function createServer(): FastifyInstance {
     if (!request.organizationId) {
       throw new UnauthorizedError('Organization context required. Please provide X-Organization-Id header.');
     }
+
+    if (!UUID_REGEX.test(request.organizationId)) {
+      throw new ValidationError('X-Organization-Id header must be a valid UUID', [
+        { header: 'X-Organization-Id' },
+      ]);
+    }
   });
 
   // Register error handler
@@ -67,6 +78,9 @@ export function createServer(): FastifyInstance {
   app.register(locationsRoutes, { prefix: '/api/locations' });
   app.register(suppliersRoutes, { prefix: '/api/suppliers' });
   app.register(customersRoutes, { prefix: '/api/customers' });
+  app.register(purchaseReceiptsRoutes, { prefix: '/api/purchase-receipts' });
+  app.register(transfersRoutes, { prefix: '/api/transfers' });
+  app.register(writeOffsRoutes, { prefix: '/api/write-offs' });
 
   return app;
 }

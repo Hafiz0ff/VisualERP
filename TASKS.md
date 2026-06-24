@@ -10,12 +10,13 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 3 - API Contract
 - [x] Phase 4 - Backend MVP Foundation
 - [x] Phase 5 - Backend Infrastructure & Domain Services
-- [ ] Phase 6 - Business Document Workflows
-- [ ] Phase 7 - Frontend Integration
-- [ ] Phase 8 - Reports and Dashboard
-- [ ] Phase 9 - Testing and Hardening
-- [ ] Phase 10 - Deployment
-- [ ] Phase 11 - Industry Profiles
+- [x] Phase 6 - Business Document Workflows
+- [ ] Phase 7 - Production and Shipment Workflows
+- [ ] Phase 8 - Frontend Integration
+- [ ] Phase 9 - Reports and Dashboard
+- [ ] Phase 10 - Testing and Hardening
+- [ ] Phase 11 - Deployment
+- [ ] Phase 12 - Industry Profiles
 
 ## Phase Notes
 
@@ -117,14 +118,26 @@ Scope:
 
 ### Phase 6 - Business Document Workflows
 
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented core REST API endpoints (GET, POST, GET /:id, PATCH, POST /:id/post, POST /:id/cancel) for Purchase Receipts, Transfers, and Write-offs.
+- Enforced document state transition guards (DRAFT -> POSTED -> CANCELLED) via lifecycle service checks.
+- Bound mutations to atomic database transactions containing stock ledger movements, batch resolutions, and audit log entries.
+- Applied idempotency check hooks preventing duplicate request executions.
+
+---
+
+### Phase 7 - Production and Shipment Workflows
+
 Status: next recommended task.
 
 Planned outcomes:
-- Implement complete transaction post/cancel workflows for Purchase Receipts (updating batch parameters, recording ledger entry).
-- Implement location-to-location Transfers (verifying stock availability before write-down, writing ledger entry).
-- Implement Production Order lifecycles (consuming component batches using FIFO/FEFO strategies, writing yield output ledger lines).
-- Implement Shipments, Write-offs, and physical Inventory Audits.
-- Enforce ledger-level document immutability and reversing transaction logic.
+- Implement Bill of Materials (BOM) validation, activation, and item component configurations.
+- Implement Production Order workflows and states (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED).
+- Implement component consumption (FIFO/FEFO batch resolutions) and finished goods output ledger movements.
+- Implement Shipments matching customer sales.
+- Enforce transactional rollbacks and ledger immutability constraints.
 
 ---
 

@@ -47,8 +47,9 @@ These rules govern the development, database design, and backend implementation 
 - Do not write database operations that use `DELETE` on posted transactions.
 - All corrections must happen via:
   - Status updates (`status = 'cancelled'`).
-  - Creating compensating transaction lines in `StockMovementLine` (offsetting positive/negative quantities).
+  - `StockLedgerService` cancellation of the posted movement, or an explicitly designed compensating movement if a later phase changes the reversal strategy.
 - Do not introduce mutable "current stock balance" or mutable "current batch quantity by location" tables as the primary source of truth. If snapshots or read models are added later, they must be rebuildable from posted movements.
+- **Compensating Cancellations**: When cancelling a posted document, you must verify that reversing the stock mutations does not cause stock levels (in location-specific item/batch balances) to fall below zero. If the available balance is insufficient, the cancellation must be rejected.
 
 ---
 
@@ -58,6 +59,7 @@ These rules govern the development, database design, and backend implementation 
 - **Posted Immutability**: The API controllers and service layers must block any updates (PUT/PATCH/DELETE) targeting a document with a status of `POSTED` or `CANCELLED`.
 - **Shipment Lifecycle Naming**: Shipment execution uses `SHIPPED` status and `/ship` action endpoints. Do not model shipments as generic `/post` actions in API code.
 - **Zod Validation**: All API request payloads must be strictly validated at the controller boundary using Zod schemas before being passed to domain logic.
+- **Idempotent Lifecycle Actions**: Stock-affecting lifecycle routes (`/post`, `/cancel`, `/ship`, `/complete`, `/approve`) must require `Idempotency-Key`, cache successful duplicate responses, reject same-key payload conflicts, and clear pending keys after failed handlers so safe retries are possible.
 - **Granular Permission Guards**: Every endpoint must be guarded by an authorization middleware that checks if the active user's role contains the required granular permission string (`module:action`) specified in the permissions matrix.
 - **Multi-Tenant Context Scoping**: The API must verify the tenant context (`X-Organization-Id` or session-bound organization) for every request. Any query referencing items, locations, or documents must ensure they match the active organization. Scoping violations must return `403 Forbidden` (code `ORGANIZATION_SCOPE_VIOLATION`).
 

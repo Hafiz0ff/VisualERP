@@ -40,3 +40,16 @@ When stock is consumed, VisualERP resolves which specific batches (`StockBatch`)
 1. **MANUAL**: The user explicitly passes the `batchId` to consume.
 2. **FIFO (First In, First Out)**: Allocates approved stock starting from the oldest received batch (`receivedDate`, with `createdAt` as fallback).
 3. **FEFO (First Expired, First Out)**: Allocates approved stock starting from the batch with the earliest `expirationDate`. If no expiration is set, it falls back to oldest received date.
+
+---
+
+## 5. Stock Movement Sign Convention & Cancellations
+
+All stock movements follow a positive-quantity convention:
+- **Receipts**: targetLocationId = locationId (incoming, increases stock).
+- **Transfers**: sourceLocationId = sourceLocation, targetLocationId = targetLocation (decreases source, increases target).
+- **Write-offs**: sourceLocationId = locationId (outgoing, decreases stock).
+
+When a posted document is cancelled:
+- The system calls `StockLedgerService.cancelMovement`, which transitions the status of the associated `StockMovement` to `CANCELLED`.
+- Since dynamic balances only query movements with `POSTED` status, this cancellation instantly neutralizes the stock changes, correcting balances back to their original state.

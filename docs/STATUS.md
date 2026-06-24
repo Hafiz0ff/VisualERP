@@ -8,7 +8,8 @@
 - **Phase 3 (API Contract)**: Completed on 2026-06-25. Established REST API specifications (`API-CONTRACT.md`), standardized error code envelopes (`API-ERRORS.md`), role permission scopes (`API-PERMISSIONS.md`), and aligned testing/development guidelines.
 - **Phase 4 (Backend MVP Foundation)**: Completed on 2026-06-25. Implemented Fastify server, database-backed idempotency service, centralized error handler, tenant scoping via request context, audit/permission placeholders, Zod validation hooks, and core CRUD dictionary endpoints for Organizations, Industry Profiles, Units, Item Categories, Items, Locations, Suppliers, and Customers.
 - **Phase 5 (Backend Infrastructure & Domain Services)**: Completed on 2026-06-25. Implemented transaction manager, base repository pattern, document lifecycle assertions, concurrency-safe sequential document numbering, dynamic stock ledger calculations, stock availability checks, MANUAL/FIFO/FEFO batch allocation resolver, and transaction-safe domain event bus.
-- **Backend/API/Frontend**: Backend core foundation, dictionary endpoints, and reusable domain infrastructure services are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
+- **Phase 6 (Business Document Workflows)**: Completed on 2026-06-25. Implemented transactional document workflows (create, update, retrieve, list, post, cancel) and stock movement adjustments for Purchase Receipts, location-to-location Transfers, and Write-offs. Enforced non-negative stock level constraints, batch registrations, and idempotency key checks.
+- **Backend/API/Frontend**: Backend core dictionaries, infrastructure primitives, and warehouse document workflows (Purchase Receipts, Transfers, Write-offs) are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
 
 ## Current Product Direction
 
@@ -18,11 +19,11 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 6 — Business Document Workflows**
+Next recommended task: **Phase 7 — Production and Shipment Workflows**
 
-Phase 6 will cover:
-- Implementing complete transaction post/cancel workflows for Purchase Receipts (updating batch parameters, recording ledger entry).
-- Implementing location-to-location Transfers (verifying stock availability before write-down, writing ledger entry).
-- Implementing Production Order lifecycles (consuming component batches using FIFO/FEFO strategies, writing yield output ledger lines).
-- Implementing Shipments, Write-offs, and physical Inventory Audits.
+Phase 7 will cover:
+- Implementing Bill of Materials (BOM) creation, validation, and active-status restrictions.
+- Implementing Production Order lifecycles (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED).
+- Implementing Production Consumption (allocating raw component batches via FIFO/FEFO) and Finished Goods Output.
+- Implementing Shipment workflows (SHIPPED) matching customer orders.
 - Enforcing ledger-level document immutability and reversing transaction logic.

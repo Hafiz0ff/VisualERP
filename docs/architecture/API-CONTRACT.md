@@ -82,7 +82,8 @@ For stock-altering operations (Posting receipts, completing production, shipping
 
 - **Same Key + Same Payload**: Server returns the exact same cached response (without executing the database transaction twice).
 - **Same Key + Different Payload**: Server returns `409 Conflict` (code `IDEMPOTENCY_CONFLICT`).
-- **Storage**: Idempotency keys require a durable shared store in production, such as a database table or Redis configured for persistence. In-memory storage is acceptable only for local development.
+- **Storage**: Idempotency keys are stored durably in the `IdempotencyKey` database table. In-memory storage is not acceptable for stock-affecting actions.
+- **Failed Handler Cleanup**: If a request fails before a successful response is cached, the pending key is cleared so a corrected retry is not blocked until expiration.
 - **Retention**: Keys expire after a configured retention period, initially planned as 24 hours.
 
 ---

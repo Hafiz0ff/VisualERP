@@ -61,11 +61,11 @@ Permissions are grouped by modules and control access to data actions.
 - `shipments:cancel` — Cancel shipment.
 
 ### 1.7 Write-offs Module
-- `writeoffs:read` — View write-offs.
-- `writeoffs:create` — Create draft write-offs.
-- `writeoffs:update` — Edit draft write-offs.
-- `writeoffs:post` — Post write-off (decreases stock).
-- `writeoffs:cancel` — Cancel write-off.
+- `write_offs:read` — View write-offs.
+- `write_offs:create` — Create draft write-offs.
+- `write_offs:update` — Edit draft write-offs.
+- `write_offs:post` — Post write-off (decreases stock).
+- `write_offs:cancel` — Cancel write-off.
 
 ### 1.8 Audit Log & Settings
 - `stock:read` — View derived stock balances, batches, and movement ledger records.
@@ -111,8 +111,8 @@ VisualERP uses Role-Based Access Control (RBAC). Below is the mapping of permiss
 | `shipments:ship`/`cancel` | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
 | `stock:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `dashboard:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| `writeoffs:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| `writeoffs:create`/`update` | ✔ | ✔ | ✔ | ✔ | ✔ | ✘ |
-| `writeoffs:post`/`cancel` | ✔ | ✔ | ✔ | ✔ | ✔ | ✘ |
+| `write_offs:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `write_offs:create`/`update` | ✔ | ✔ | ✔ | ✔ | ✔ | ✘ |
+| `write_offs:post`/`cancel` | ✔ | ✔ | ✔ | ✔ | ✔ | ✘ |
 | `audit_log:read` | ✔ | ✘ | ✘ | ✘ | ✘ | ✔ |
 | `settings:manage` | ✔ | ✘ | ✘ | ✘ | ✘ | ✘ |

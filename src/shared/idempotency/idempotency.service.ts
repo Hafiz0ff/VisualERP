@@ -43,8 +43,12 @@ export class IdempotencyService {
           where: { id: existing.id },
         });
       } else {
-        // If request hash does not match, throw conflict
-        if (existing.requestHash !== requestHash) {
+        // The same key can only replay the exact same method, path, and payload.
+        if (
+          existing.method !== params.method ||
+          existing.path !== params.path ||
+          existing.requestHash !== requestHash
+        ) {
           throw new IdempotencyConflictError();
         }
 
@@ -56,7 +60,10 @@ export class IdempotencyService {
           };
         }
 
-        // If PENDING, return PENDING status (prevents concurrent double execution)
+        if (existing.status === 'PENDING') {
+          throw new IdempotencyConflictError('A request is already in progress with this idempotency key');
+        }
+
         return {
           status: 'PENDING',
         };
@@ -104,6 +111,19 @@ export class IdempotencyService {
         status: 'RESOLVED',
         responseStatus: params.responseStatus,
         responseBody: params.responseBody ? JSON.parse(JSON.stringify(params.responseBody)) : null,
+      },
+    });
+  }
+
+  public static async clearRequest(params: {
+    organizationId: string;
+    key: string;
+  }): Promise<void> {
+    await prisma.idempotencyKey.deleteMany({
+      where: {
+        organizationId: params.organizationId,
+        key: params.key,
+        status: 'PENDING',
       },
     });
   }
