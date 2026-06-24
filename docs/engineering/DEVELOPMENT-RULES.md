@@ -76,6 +76,9 @@ These rules govern the development, database design, and backend implementation 
 
 - **Scoping to Tenant**: Every database query that interacts with business data must explicitly filter by `organizationId`. Failing to include `organizationId` is a critical security vulnerability.
 - **Audit Logging**: Any write operation that updates user permissions, alters system configurations, or transitions documents to `Posted` or `Cancelled` states must write an entry to `AuditLog` within the same database transaction.
+- **Transaction Manager**: Always execute multi-model mutations or document state transitions within `runInTransaction`. Passing the transaction client (`tx`) down to all nested repository and service calls is mandatory.
+- **Document Lifecycles**: Validate and transition all document states strictly using `DocumentLifecycleService`. No manual status edits are permitted.
+- **In-Process Events**: Publish domain events synchronous-style using `EventBus`. Never allow handlers to catch errors silently when running inside transactions; propagation is required to trigger automated database rollbacks.
 
 ---
 

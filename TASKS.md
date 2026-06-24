@@ -9,12 +9,13 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 2 - Database Schema
 - [x] Phase 3 - API Contract
 - [x] Phase 4 - Backend MVP Foundation
-- [ ] Phase 5 - Transactional Logic & Ledgers
-- [ ] Phase 6 - Frontend Integration
-- [ ] Phase 7 - Reports and Dashboard
-- [ ] Phase 8 - Testing and Hardening
-- [ ] Phase 9 - Deployment
-- [ ] Phase 10 - Industry Profiles
+- [x] Phase 5 - Backend Infrastructure & Domain Services
+- [ ] Phase 6 - Business Document Workflows
+- [ ] Phase 7 - Frontend Integration
+- [ ] Phase 8 - Reports and Dashboard
+- [ ] Phase 9 - Testing and Hardening
+- [ ] Phase 10 - Deployment
+- [ ] Phase 11 - Industry Profiles
 
 ## Phase Notes
 
@@ -102,16 +103,28 @@ Scope:
 
 ---
 
-### Phase 5 - Transactional Logic & Ledgers
+### Phase 5 - Backend Infrastructure & Domain Services
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented transaction manager, base repository abstractions, and generic domain validation helpers.
+- Built reusable document lifecycle assertion services and prefix-based, concurrency-safe document number generation.
+- Developed dynamic stock ledger calculations, stock availability validation checks, and MANUAL/FIFO/FEFO batch allocation resolvers.
+- Created transaction-safe, synchronous, in-process domain event bus.
+
+---
+
+### Phase 6 - Business Document Workflows
 
 Status: next recommended task.
 
 Planned outcomes:
-- Implement transactional document routes and services: Purchase Receipts, location-to-location Transfers, Production Orders (with Material Consumption and Finished Goods Output), and Shipments.
-- Implement write-off transactions and physical inventory count audits.
-- Enforce non-negative stock balance invariants at transaction boundaries.
-- Calculate dynamic per-location stock balances and batch lifecycle tracking.
-- Implement ledger-level immutability blocks for posted transactions.
+- Implement complete transaction post/cancel workflows for Purchase Receipts (updating batch parameters, recording ledger entry).
+- Implement location-to-location Transfers (verifying stock availability before write-down, writing ledger entry).
+- Implement Production Order lifecycles (consuming component batches using FIFO/FEFO strategies, writing yield output ledger lines).
+- Implement Shipments, Write-offs, and physical Inventory Audits.
+- Enforce ledger-level document immutability and reversing transaction logic.
 
 ---
 

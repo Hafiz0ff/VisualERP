@@ -21,7 +21,11 @@ Use integration tests for:
 - module interactions;
 - repository and persistence behavior;
 - stock movement flows;
-- production-to-stock effects.
+- production-to-stock effects;
+- **Dynamic Ledger Tests**: Verify that balances computed via `StockLedgerService` are correct after posting multiple incoming/outgoing movements, including correct location-specific calculations;
+- **Transactional Rollback Tests**: Assert that when a document fails to save, all created lines, sequence increments, and audit log writes are completely rolled back;
+- **Event Dispatch Tests**: Verify that Event Bus subscribers execute synchronously and that subscriber errors poison and abort the active Prisma transaction;
+- **Number Generation Concurrency Tests**: Simulate concurrent generation requests to verify that no duplicate document sequence numbers are generated.
 
 ### API Tests
 

@@ -24,6 +24,7 @@ Key conventions:
 - **TerminologyConfig**: Allows a tenant to translate core names (e.g. mapping `BOM` -> "Рецептура" or "Состав изделия") dynamically in the client application.
 - **ModuleConfig**: Connects modules (WAREHOUSE, PRODUCTION, BOM, etc.) to a tenant, allowing instant toggling without modifying database rows.
 - **IdempotencyKey**: Database table storing request hashes and response cache data linked to `Organization` to support API mutation deduplication.
+- **DocumentSequence**: Database table storing last sequential number value per prefix per organization, used for concurrency-safe document ID generation.
 
 ### 2.2 Items & Units (Master Data)
 - **Item**: Core product, material, or component card. Includes `itemType` enum (`MATERIAL`, `COMPONENT`, `PACKAGING`, `SEMI_FINISHED`, `FINISHED_PRODUCT`, `SERVICE`, `CONSUMABLE`).

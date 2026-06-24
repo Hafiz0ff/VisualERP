@@ -489,6 +489,8 @@ interface UpdateInventoryAuditCountsDTO {
 - `GET /api/stock/movements` — Query historical stock movement ledger lines list.
 - `GET /api/stock/batches` — List active batches and their statuses.
 
+*Note: All stock balance endpoints dynamically aggregate posted `StockMovementLine` quantities in the database using the formulas defined in the Stock Ledger specification, ensuring transactional accuracy.*
+
 ---
 
 ### 5.7 Dashboard

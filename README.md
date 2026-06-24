@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%204%20complete-1f6feb?style=for-the-badge" alt="Phase 4 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%205%20complete-1f6feb?style=for-the-badge" alt="Phase 5 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -136,15 +136,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 4 |
+| Product documentation | Complete for Phase 5 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | MVP Foundation complete (Fastify, Prisma, Zod) |
+| Backend implementation | Infrastructure & Domain Services complete |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 5 - Transactional Logic & Ledgers |
+| Next recommended phase | Phase 6 - Business Document Workflows |
 
 ## Planned Tech Direction
 
@@ -263,13 +263,23 @@ Phase 4 established:
 - Zod pre-validation hook structure;
 - CRUD routes and service queries for the 8 core master data collections.
 
+### Phase 5
+
+Phase 5 established:
+
+- Prisma database transactions manager and scoped base repository helpers;
+- reusable document lifecycle validation services and concurrency-safe prefix sequential document numbering;
+- dynamic stock ledger calculations, stock availability validation checks, and MANUAL/FIFO/FEFO batch allocation resolvers;
+- synchronous, transaction-safe in-process Event Bus.
+
 ## Next Step
 
-**Phase 5 - Transactional Logic & Ledgers**
+**Phase 6 - Business Document Workflows**
 
 The next phase should define:
 
-- transactional document logic (Purchase Receipts, Transfers, Production Orders, Shipments);
-- non-negative stock balance invariants;
-- dynamic stock balance and batch lifecycle tracking;
-- ledger-level immutable transaction status and reversing movement entries.
+- posting/cancelling workflows for Purchase Receipts;
+- location-to-location Transfers;
+- Production Order lifecycles with material consumption and outputs;
+- Shipments, Write-offs, and physical Inventory Audits;
+- ledger-level immutable transaction status checks.
