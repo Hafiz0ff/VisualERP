@@ -1,377 +1,358 @@
+# 🛠️ VisualERP
+
+> **Лёгкая, наглядная и модульная ERP-система для малого производственного бизнеса.**
+> Современная альтернатива хаотичным Excel-таблицам и перегруженным legacy-системам (вроде 1С) для небольших цехов и мастерских.
+>
+> **Lightweight, visual, and modular ERP system for small manufacturing businesses.**
+> A modern alternative to messy Excel files and bloated legacy workflows for small-scale factories.
+
+---
+
 <div align="center">
-  <h1>VisualERP</h1>
-  <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
-  <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%2012%20complete-1f6feb?style=for-the-badge" alt="Phase 12 Complete" />
-    <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
-    <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
-    <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
+    <img src="https://img.shields.io/badge/Status-Phase%2013%20Complete-brightgreen?style=for-the-badge&logo=github" alt="Phase 13 Complete" />
+    <img src="https://img.shields.io/badge/Version-v0.9.0--beta-orange?style=for-the-badge" alt="Beta Release" />
+    <img src="https://img.shields.io/badge/Architecture-Modular%20Monolith-blue?style=for-the-badge" alt="Modular Monolith" />
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/Backend-Fastify%20%2B%20TS-d13b4f?style=flat-square&logo=fastify" alt="Fastify Backend" />
+    <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20TS-61dafb?style=flat-square&logo=react" alt="React Frontend" />
+    <img src="https://img.shields.io/badge/Database-PostgreSQL%20%2B%20Prisma-0287d0?style=flat-square&logo=prisma" alt="Database" />
+    <img src="https://img.shields.io/badge/Container-Docker%20Compose-2496ed?style=flat-square&logo=docker" alt="Docker Compose" />
   </p>
 </div>
 
-## Overview
+---
 
-VisualERP is being designed as a **universal mini-ERP** for small production companies that need operational clarity without enterprise overhead.
+## 🇷🇺 Содержание / Russian Version
+1. [Обзор проекта](#описание-проекта)
+2. [Архитектурная формула](#архитектурная-формула)
+3. [Бизнес-логика и складской учёт](#бизнес-логика-и-складской-учёт)
+4. [Технологический стек](#технологический-стек)
+5. [Карта документации](#карта-документации)
+6. [Инструкция по запуску](#инструкция-по-быстрому-запуску)
+7. [История фаз и прогресс](#история-фаз-и-прогресс)
 
-The first prototype context is a **dry construction mixes workshop**, but the system architecture is intentionally broader. The target product is a reusable operational platform for multiple industries:
+## 🇬🇧 Table of Contents / English Version
+1. [Project Overview](#project-overview)
+2. [Architectural Formula](#architectural-formula-1)
+3. [Business Logic & Stock Accounting](#business-logic---stock-accounting)
+4. [Tech Stack](#tech-stack-1)
+5. [Documentation Map](#documentation-map-1)
+6. [Quick Start Guide](#quick-start-guide)
+7. [Phase Progress & Roadmap](#phase-progress--roadmap)
 
-- dry construction mixes;
-- food production;
-- dairy;
-- meat processing;
-- snacks;
-- furniture;
-- tools;
-- textile;
-- packaging;
-- other small workshops.
+---
 
-## Описание На Русском
+# 🇷🇺 РУССКАЯ ВЕРСИЯ
 
-**VisualERP** — это лёгкая и наглядная система управления для небольших производственных компаний. Она помогает заменить разрозненные таблицы, ручной учёт и перегруженные старые решения понятным рабочим пространством для склада, производства, списаний, отгрузок и контроля истории операций.
+## Описание проекта
 
-Проект строится как универсальная основа: сначала отрабатывается пример цеха сухих строительных смесей, но внутренняя модель не привязана к одной отрасли. Те же принципы подходят для пищевого производства, молочной продукции, мебели, упаковки, текстиля и других небольших мастерских.
+**VisualERP** создана для малых производственных компаний, которым нужен порядок в операциях без избыточной бюрократии корпоративных систем. Она помогает видеть реальные остатки по складам и партиям, оформлять перемещения, планировать производство по рецептурам и отслеживать отгрузки клиентам.
 
-Главная идея VisualERP:
+### Для кого подходит:
+* 🧱 Производство строительных смесей (целевой пилотный кейс)
+* 🧀 Пищевые цеха (сыроварни, мясное производство, снеки)
+* 🪑 Небольшие сборочные мастерские (мебель, инструменты, упаковка)
+* 👕 Текстильные и швейные производства
 
-- видеть реальные остатки по складам и партиям;
-- оформлять поступления, перемещения и списания через строгие документы;
-- хранить понятную историю действий;
-- разделять права сотрудников;
-- подстраивать названия и состав разделов под конкретное производство;
-- не допускать расхождения между документами и складскими остатками.
+---
 
-Текущая версия уже содержит основу серверной части, первые складские документы, производственные заказы и отгрузки. Остатки считаются не вручную, а по журналу проведённых движений, поэтому система сохраняет проверяемую историю вместо скрытого изменения чисел.
+## Архитектурная формула
 
-## Product Positioning
+Система строится по принципу:
+$$\text{VisualERP Core} + \text{Отраслевые профили (Profiles)} + \text{Дополнительные модули (Modules)}$$
 
-VisualERP is a lightweight, visual, modular alternative to:
+Ядро системы полностью изолировано от отраслевой специфики. Любые изменения терминологии (например, переименование «Сырья» в «Компоненты» или «Второго склада» в «Сушильный цех») выполняются через файл конфигурации профиля, не затрагивая структуру базы данных.
 
-- fragmented Excel-based accounting;
-- manual stock and production tracking;
-- overloaded legacy 1C-style workflows for small teams.
+---
 
-The product aims to make daily operations easier for companies that need:
+## Бизнес-логика и складской учёт
 
-- clear stock visibility;
-- traceable production flows;
-- structured write-offs and corrections;
-- role-based access;
-- auditable operational history.
+### 📈 Движение запасов через Ledger-архитектуру
+В отличие от простых систем, где баланс товара хранится в виде одного перезаписываемого числа, в VisualERP используется **метод двойной записи (Stock Ledger)**.
+* Любое действие (приёмка, перемещение, списание, выпуск, отгрузка) рождает неизменяемую запись в таблице `StockMovement`.
+* Текущие остатки на складах рассчитываются динамически путём суммирования всех исторических движений.
+* Предотвращаются любые расхождения данных: баланс невозможно изменить в обход документа.
 
-## Core Product Formula
+### 🔄 Жизненный цикл документов:
+Все складские документы проходят строгий жизненный цикл:
+$$\text{Черновик (DRAFT)} \longrightarrow \text{Проведён (POSTED)} \longrightarrow \text{Отменён (CANCELLED)}$$
+При отмене документа система автоматически делает компенсирующие записи в реестре, предварительно проверяя, не приведёт ли это к отрицательным остаткам на складе.
 
-```txt
-VisualERP Core
-+ Industry Profiles
-+ Optional Modules
+### 🏭 Базовый бизнес-процесс:
+```text
+[Поступление сырья (PR)] ➔ Накопление на складе ➔ [Перемещение в цех (TR)] ➔
+➔ [Производство (PRD)] ➔ Списание компонентов по рецептуре (BOM) + Выпуск готовой продукции ➔
+➔ Накопление на складе ГП ➔ [Отгрузка клиенту (SHP)]
 ```
 
-This principle is the main architectural guardrail of the project.
+---
 
-## First Business Use Case
+## Технологический стек
 
-The first prototype is based on a dry construction mixes workshop with needs around:
+* **Backend:** Node.js, Fastify (быстрый веб-фреймворк с минимальными накладными расходами), TypeScript.
+* **ORM & БД:** Prisma ORM, СУБД PostgreSQL.
+* **Валидация:** Zod (строгая валидация входящих DTO на уровне маршрутов).
+* **Idempotency:** База данных хранит ключи идемпотентности (`IdempotencyKey`) для предотвращения двойных списаний при сетевых сбоях.
+* **Frontend:** React, TypeScript, Vite. Использован красивый интерфейс с адаптивной сеткой и микро-анимациями.
+* **Контейнеризация:** Docker Compose, мульти-стадийные `Dockerfile`. Веб-сервер Nginx встроен в контейнер фронтенда для проксирования запросов к API, что полностью снимает проблему CORS.
 
-- raw materials;
-- recipe-driven production;
-- warehouse-to-workshop transfers;
-- finished goods output;
-- shipments;
-- write-offs;
-- reporting and auditability.
+---
 
-This is the initial profile, not the long-term system boundary.
+## Карта документации
 
-## Universal Domain Direction
+Все проектные требования, спецификации и руководства хранятся в папке [docs/](docs):
 
-The core model uses **industry-agnostic ERP entities**:
+| Путь к файлу | Назначение документа |
+| :--- | :--- |
+| [docs/PROJECT-CONTEXT.md](docs/PROJECT-CONTEXT.md) | Контекст проекта, бизнес-проблематика и цели |
+| [docs/STATUS.md](docs/STATUS.md) | Текущий статус разработки и завершённые фазы |
+| [docs/product/PRODUCT-SPEC.md](docs/product/PRODUCT-SPEC.md) | Подробное описание продуктовых требований и ролей |
+| [docs/architecture/DATA-MODEL.md](docs/architecture/DATA-MODEL.md) | Описание доменных сущностей и структуры складского учёта |
+| [docs/architecture/API-CONTRACT.md](docs/architecture/API-CONTRACT.md) | Единый стандарт ответов API, структуры запросов и DTO |
+| [docs/architecture/API-ERRORS.md](docs/architecture/API-ERRORS.md) | Полный каталог ошибок и HTTP-статусов системы |
+| [docs/deployment/INSTALL.md](docs/deployment/INSTALL.md) | Инструкция по развёртыванию Docker Compose на VPS-сервер |
+| [docs/deployment/BACKUP.md](docs/deployment/BACKUP.md) | Настройка регулярного резервного копирования базы данных |
 
-- `Item`
-- `ItemCategory`
-- `Unit`
-- `Warehouse`
-- `Workshop`
-- `StockBatch`
-- `StockMovement`
-- `BOM`
-- `ProductionOrder`
-- `Shipment`
-- `WriteOff`
-- `InventoryAudit`
-- `User`
-- `Role`
-- `AuditLog`
+---
 
-Industry-specific wording will be configurable through `IndustryProfile`.
+## Инструкция по быстрому запуску
 
-## Core Business Flow
+### 1. Локальный запуск в режиме разработки (dev)
 
-```txt
-Purchase receipt
--> Warehouse stock
--> Transfer to workshop
--> Workshop stock
--> Production order
--> Material consumption
--> Finished goods output
--> Finished goods stock
--> Shipment
--> Write-off / correction
--> Reports
--> Audit log
+#### Требования:
+* Node.js версии 18 или выше
+* Установленный PostgreSQL (или запущенный локальный контейнер с PostgreSQL)
+
+#### Настройка БД:
+Создайте файл `.env` в корневом каталоге на основе шаблона `.env.example`:
+```bash
+DATABASE_URL="postgresql://postgres:password@localhost:5432/visualerp?schema=public"
+JWT_SECRET="develop-key-change-me"
 ```
 
-## Planned Modules
-
-### MVP Modules
-
-- Warehouse
-- Production
-- BOM / Recipe
-- Shipments
-- Write-offs
-- Reports
-- Audit Log
-- Users and Roles
-
-### Future Optional Modules
-
-- Quality Control
-- Finance
-- CRM
-- Equipment Maintenance
-- Payroll
-- Multi-branch support
-- Offline sync
-- Barcode / QR support
-- Mobile warehouse app
-
-## Current Status
-
-| Area | Status |
-| --- | --- |
-| Repository foundation | Complete |
-| Product documentation | Complete through Phase 13 |
-| Architecture direction | Defined and aligned with the domain model |
-| Domain model | Complete |
-| Database schema foundation | Complete |
-| API contract | Complete |
-| Backend implementation | Transactional warehouse, production, shipment, inventory audit, reports, and dashboard APIs complete |
-| Initial Prisma schema | Complete |
-| Frontend application | Read-only API integration and core mutation/lifecycle flows connected |
-| Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 14 - Security, Auth & Roles Enforcement |
-
-
-## Planned Tech Direction
+#### Запуск backend-сервера:
+```bash
+# Установка зависимостей ядра
+npm install
 
-The repository is currently documentation-first. The planned implementation direction is:
-
-- Frontend: React + TypeScript
-- Backend: Node.js + TypeScript
-- Architecture: Modular monolith
-- API: JSON/REST
-- Database: PostgreSQL
-- Validation: Zod
-- Testing: unit, integration, API, permission, audit, and business-flow coverage
-
-Framework-level decisions can be finalized in the next phases now that the domain model is locked.
+# Применение структуры БД и генерация Prisma-клиента
+npx prisma db push
+npx prisma generate
 
-## Repository Map
-
-| Path | Purpose |
-| --- | --- |
-| [`docs/PROJECT-CONTEXT.md`](docs/PROJECT-CONTEXT.md) | Why the project exists and what problem it solves |
-| [`docs/STATUS.md`](docs/STATUS.md) | Current repository and phase status |
-| [`docs/RELEASE-NOTES.md`](docs/RELEASE-NOTES.md) | Versioned MVP release notes and beta boundaries |
-| [`docs/product/`](docs/product) | Product requirements, roles, processes, modules |
-| [`docs/architecture/`](docs/architecture) | System architecture, conceptual data model, API, security, offline, finance |
-| [`docs/engineering/`](docs/engineering) | Engineering rules, testing, performance, UI principles |
-| [`docs/migration/`](docs/migration) | Excel-to-VisualERP migration thinking |
-| [`docs/roadmap/`](docs/roadmap) | Delivery roadmap from documentation to pilot |
-| [`docs/decisions/`](docs/decisions) | ADRs and structural decisions |
+# Заполнение БД демо-данными (производственный рецепт, сырье, склады)
+npm run db:seed
+
+# Запуск backend в dev-режиме
+npm run dev
+```
+Интерфейс API будет доступен по адресу `http://localhost:3000`.
 
-## Documentation-First Workflow
+#### Запуск frontend-клиента:
+В новом терминале:
+```bash
+cd app
+npm install
+npm run dev
+```
+Интерфейс будет доступен по адресу `http://localhost:5173`.
+
+---
 
-Before adding implementation code:
+### 2. Запуск E2E авто-теста бизнес-процесса
+В системе присутствует сквозной автоматический скрипт тестирования [verify_e2e.ts](verify_e2e.ts). Он полностью имитирует действия пользователей: делает закупки сырья, перемещения в цех, запускает рецептурное производство, отгружает товар и проводит аудит склада, сверяя балансы в БД на каждом шаге.
 
-1. Read [`docs/PROJECT-CONTEXT.md`](docs/PROJECT-CONTEXT.md).
-2. Read [`docs/product/PRODUCT-SPEC.md`](docs/product/PRODUCT-SPEC.md).
-3. Read [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md).
-4. Read [`docs/engineering/DEVELOPMENT-RULES.md`](docs/engineering/DEVELOPMENT-RULES.md).
-5. Confirm the requested work matches the current phase in [`TASKS.md`](TASKS.md).
+Для запуска теста (при работающем бэкенде):
+```bash
+npx ts-node verify_e2e.ts
+```
 
-## AI Agent Working Agreement
+---
+
+### 3. Запуск через Docker Compose (Production-ready)
+Для имитации полноценного боевого сервера (или развёртывания на VPS):
+```bash
+# Копирование переменных среды для продакшена
+cp .env.production.example .env
 
-All AI coding agents working in this repository must follow these rules:
+# Сборка и запуск контейнеров в фоне
+docker compose up --build -d
+```
+После этого система будет запущена на едином **порту 80** (вход через Nginx с проксированием к API). Вы сможете зайти на `http://localhost`.
 
-- read documentation before coding;
-- do not invent business rules;
-- do not hardcode industry-specific logic into the core;
-- keep the modular architecture intact;
-- prefer strict TypeScript and small focused files;
-- update [`TASKS.md`](TASKS.md) and [`docs/STATUS.md`](docs/STATUS.md) when a phase changes;
-- update `README.md` after every major spec, major phase, or significant scope change so the GitHub landing page always reflects the real project state.
+---
 
-Supporting instructions:
+## История фаз и прогресс
 
-- [`AGENTS.md`](AGENTS.md)
-- [`CLAUDE.md`](CLAUDE.md)
-- [`CODEX.md`](CODEX.md)
+* **Фаза 0** — Базовые правила, дорожная карта, стандарты работы агентов.
+* **Фаза 1** — Доменная модель, правила расчёта запасов по Ledger, спецификации сущностей.
+* **Фаза 2** — База данных. Реализована схема Prisma, индексы и демо-сид данных.
+* **Фаза 3** — Спецификации контракта API, каталога ошибок и матрицы доступов.
+* **Фаза 4** — Настройка Fastify, логирование запросов, CRUD-справочники мастер-данных.
+* **Фаза 5** — Инфраструктурные сервисы: менеджер транзакций БД, нумератор документов, расчёт балансов FIFO/FEFO.
+* **Фаза 6** — Документы склада: Закупки сырья, Перемещения, Списания с транзакционными проводками.
+* **Фаза 7** — Производство и отгрузки: Заказы на производство, списание по рецептурам BOM с waste-коэффициентами, выпуск готовой продукции, расходные накладные.
+* **Фаза 8** — Инвентаризация и складские отчёты: сличительные ведомости, корректировка излишков и недостач, матричные отчёты остатков.
+* **Фаза 9** — Интерактивный дашборд руководителя: сводные графики, метрики за месяц, журнал последних событий аудита.
+* **Фаза 10** — Детальный план интеграции фронтенда, маппинг экранов прототипа на DTO.
+* **Фаза 11** — Интеграция API-клиента на фронтенд, перевод всех 11 экранов в режим реального чтения данных.
+* **Фаза 12** — Реализация форм создания и кнопок изменения статуса документов с подтверждениями и сквозными ключами идемпотентности.
+* **Фаза 13** — Docker-контейнеризация стека, скрытие паролей в логах (Fastify redaction), написание инструкций по бэкапам, миграциям и восстановлению СУБД.
 
-## Phase Progress
+---
+
+# 🇬🇧 ENGLISH VERSION
 
-### Phase 0
+## Project Overview
+
+**VisualERP** is a lightweight, visual, and modular ERP system designed for small manufacturing businesses that need clear, transparent operations without enterprise overhead. It helps teams track real stock balances, control raw material inputs, manage batch allocations, plan recipes, and run shipments.
 
-Phase 0 established:
-
-- repository structure;
-- product context;
-- universal ERP direction;
-- modular architecture baseline;
-- engineering rules;
-- AI-agent instructions;
-- roadmap and ADR foundation.
-
-It intentionally does **not** include:
-
-- production backend code;
-- final database schema;
-- frontend redesign.
-
-### Phase 1
-
-Phase 1 established:
-
-- universal domain model and ubiquitous language;
-- multi-organization and membership concepts;
-- industry profile, terminology, and module configuration concepts;
-- movement-based stock accounting rules;
-- batch traceability, BOM versioning, and document lifecycle rules;
-- conceptual API and security updates aligned with the model.
-
-### Phase 2
-
-Phase 2 established:
-
-- initial PostgreSQL + Prisma project tooling;
-- explicit relational schema for organizations, access, catalog, stock, production, shipments, write-offs, audits, and audit log;
-- UUID keys, tenant scoping, enums, indexes, and document lifecycle timestamps;
-- minimal idempotent seed data for the demo organization and dry-mixes profile;
-- database architecture documentation aligned with the domain model.
-
-### Phase 3
-
-Phase 3 established:
-
-- REST API contract overview and endpoint groups;
-- standard success, paginated list, and error envelopes;
-- business document lifecycle action endpoints;
-- conceptual DTOs aligned with the Prisma schema;
-- standardized error catalog and permission matrix;
-- idempotency rules for stock-affecting actions.
-
-### Phase 4
-
-Phase 4 established:
-
-- Fastify application shell, UUID request tracking, and centralized error hooks;
-- multi-tenant context extraction scoped to the `X-Organization-Id` header;
-- database-backed idempotency service utilizing `IdempotencyKey` table;
-- Zod pre-validation hook structure;
-- CRUD routes and service queries for the 8 core master data collections.
-
-### Phase 5
-
-Phase 5 established:
-
-- Prisma database transactions manager and scoped base repository helpers;
-- reusable document lifecycle validation services and concurrency-safe prefix sequential document numbering;
-- dynamic stock ledger calculations, stock availability validation checks, and MANUAL/FIFO/FEFO batch allocation resolvers;
-- synchronous, transaction-safe in-process Event Bus.
-
-### Phase 6
-
-Phase 6 established:
-
-- full REST API CRUD, post, and cancel endpoints for Purchase Receipts, Transfers, and Write-offs;
-- strict document lifecycle state transitions using transactional operations;
-- dynamic stock ledger adjustments and batch allocations;
-- request idempotency hooks;
-- compensating cancellation checks preventing negative stock balances on reversals.
-
-### Phase 7
-
-Phase 7 established:
-
-- full REST API CRUD, start, complete, and cancel endpoints for Production Orders, linking them to BOM-based or explicit consumption and finished goods outputs;
-- full REST API CRUD, ship, and cancel endpoints for Shipments, matching customer sales;
-- dynamic FEFO/FIFO stock batch resolvers and availability checks for production material consumption and shipments;
-- compensating cancellation checks preventing negative stock levels of output products and shipped items;
-- multi-tenant scoping and idempotency key checks.
-
-### Phase 8
-
-Phase 8 established:
-
-- full REST API CRUD, count, approve, and cancel endpoints for Inventory Audits, enabling physical stock counts reconciliation;
-- discrepancy-based stock ledger adjustments using `INVENTORY_ADJUSTMENT` movement types;
-- read-only stock reports including matrix balance sheets, per-item, and per-location status pages;
-- historical movement logs with filtering, active batch registers, and a safe documented low-stock limitation until minimum stock thresholds are modeled;
-- permission scopes and idempotency hooks.
-
-### Phase 9
-
-Phase 9 established:
-
-- real-time dashboard endpoint (`GET /api/dashboard`) returning stock summaries (dynamically aggregated from movements), production/shipment/write-off monthly counts, pending document actions, and recent audit events;
-- database seeding improvements to include partners (Supplier and Customer) for end-to-end flows;
-- comprehensive end-to-end MVP Demo Flow guide (`docs/demo/MVP-DEMO-FLOW.md`) describing a verifiable full stock and production cycle with copy-pasteable `curl` commands.
-
-### Phase 10
-
-Phase 10 established:
-
-- comprehensive frontend integration plan (`docs/frontend/FRONTEND-INTEGRATION-PLAN.md`) detailing unified API client design, envelope parsing, and organization scoping;
-- screen-by-screen mappings (`docs/frontend/API-SCREEN-MAPPING.md`) linking all 16 prototype views to backend routes, permissions, and loading/empty/error states;
-- conceptual DTO data contracts (`docs/frontend/FRONTEND-DATA-CONTRACTS.md`) for all dashboard and document list/detail views;
-- frontend state/error guidelines (`docs/frontend/FRONTEND-STATE-AND-ERRORS.md`) and role-based permissions (`docs/frontend/FRONTEND-PERMISSIONS.md`).
-
-### Phase 11
-
-Phase 11 established:
-
-- shared frontend API client with standard envelope parsing, organization scoping, and toast-based error handling;
-- active organization switching and live read-only data loading for dashboard, master data, warehouse documents, production, shipments, reports, and audit log views;
-- mapper layer translating backend DTOs into the preserved prototype screen models without changing the archived visual direction.
-
-### Phase 12
-
-Phase 12 established:
-
-- create forms and lifecycle actions for receipts, transfers, write-offs, production orders, shipments, and inventory audits;
-- centralized `Idempotency-Key` handling for state-changing document actions with confirmation dialogs;
-- live dropdowns for suppliers, customers, items, units through item metadata, warehouses, and workshops;
-- inventory audit page covering draft creation, physical count entry, approval, cancellation, and stock balance refresh;
-- backend auto-resolution of a single active BOM for a production target item when `bomId` is omitted, with explicit conflict handling for inconsistent multiple-active-BOM data.
-
-### Phase 13
-
-Phase 13 established:
-
-- **E2E Validation script**: Created a comprehensive programmatic workflow script (`verify_e2e.ts`) validating the entire lifecycle (purchase receipt, transfer, production order consumption/output, customer shipment, inventory audit discrepancy counts, and dashboard events).
-- **Containerization**: Configured multi-stage Dockerfiles for frontend (Nginx serving assets & reverse proxying `/api` to backend) and backend (Fastify API running Prisma Client), managed via a clean, unified `docker-compose.yml` file.
-- **Observability Hardening**: Redacted sensitive payload parameters (like `Authorization` headers, `password`, and `passwordHash`) in backend Fastify logger settings.
-- **Operations Documentation**: Created server deployment (`INSTALL.md`), database migration (`UPDATE.md`), backup automation (`BACKUP.md`), and disaster recovery (`RESTORE.md`) guides under `docs/deployment/`, along with a QA report (`MVP-QA-REPORT.md`) and pilot checklist.
-
-## Next Step
-
-**Phase 14 - Security, Auth & Roles Enforcement**
-
-The next phase should define:
-
-- real JWT-based session authentication with password hashing;
-- role-based permission guard middleware enforcement on all backend routes;
-- frontend routing guards for login views and screen permission capabilities.
+### Target Audiences:
+* 🧱 Dry construction mixes (initial pilot case)
+* 🧀 Food and beverage workshops (dairies, meat, snacks)
+* 🪑 Assembly shops (furniture, wooden items, packaging)
+* 👕 Textiles and apparel workshops
+
+---
+
+## Architectural Formula
+
+The project enforces a strict architectural split:
+$$\text{VisualERP Core} + \text{Industry Profiles} + \text{Optional Modules}$$
+
+The core engine is industry-agnostic. All specific naming conventions, screen layouts, or measurement units are injected via configuration profiles, keeping the database schema universally reusable.
+
+---
+
+## Business Logic & Stock Accounting
+
+### 📈 Stock Ledger Architecture
+Instead of using direct, mutable fields to store quantity numbers, VisualERP uses an immutable **Stock Ledger**:
+* Every action (receipt, transfer, write-off, production completion, shipment) writes a record to `StockMovement`.
+* Current stock balances at any warehouse or workshop are dynamically derived by summing historical ledger movements.
+* This guarantees zero database inconsistency: numbers cannot be modified outside of auditable documents.
+
+### 🔄 Document Lifecycle:
+Every business document goes through three strict states:
+$$\text{DRAFT} \longrightarrow \text{POSTED} \longrightarrow \text{CANCELLED}$$
+Posting runs database ledger adjustments. Cancelling makes compensating reverse movements, but only after asserting that no negative stock balances will occur.
+
+### 🏭 Standard Workflow:
+```text
+[Purchase Receipt (PR)] ➔ Warehouse Stock ➔ [Transfer to Workshop (TR)] ➔
+➔ Workshop Stock ➔ [Production Order (PRD)] ➔ Recipe BOM consumption + Finished Goods output ➔
+➔ Finished Product Stock ➔ [Shipment (SHP)]
+```
+
+---
+
+## Tech Stack
+
+* **Backend:** Node.js, Fastify (fast, low-overhead web framework), TypeScript.
+* **ORM & Database:** Prisma ORM, PostgreSQL database.
+* **Validation:** Zod (strict schema validation of payload DTOs on route hooks).
+* **Idempotency:** A database-backed `IdempotencyKey` table prevents duplicate actions during network retries.
+* **Frontend:** React, TypeScript, Vite. A responsive layout featuring interactive cards, shimmers, and micro-animations.
+* **Docker Infrastructure:** Multi-stage Dockerfiles and `docker-compose.yml` configuration. Nginx is embedded within the frontend container to reverse proxy `/api` calls, preventing CORS errors.
+
+---
+
+## Documentation Map
+
+Full details on specifications, schemas, and requirements are structured in the [docs/](docs) directory:
+
+| Document Path | Description |
+| :--- | :--- |
+| [docs/PROJECT-CONTEXT.md](docs/PROJECT-CONTEXT.md) | Business background, motivations, and goals |
+| [docs/STATUS.md](docs/STATUS.md) | Current project completion status |
+| [docs/product/PRODUCT-SPEC.md](docs/product/PRODUCT-SPEC.md) | Product specs, user roles, and workflows |
+| [docs/architecture/DATA-MODEL.md](docs/architecture/DATA-MODEL.md) | Core database entities and stock ledger specifications |
+| [docs/architecture/API-CONTRACT.md](docs/architecture/API-CONTRACT.md) | Unified REST API formats and request/response envelopes |
+| [docs/architecture/API-ERRORS.md](docs/architecture/API-ERRORS.md) | Complete catalog of application errors and HTTP statuses |
+| [docs/deployment/INSTALL.md](docs/deployment/INSTALL.md) | Guide for single-port Docker Compose VPS deployment |
+| [docs/deployment/BACKUP.md](docs/deployment/BACKUP.md) | Guide for setting up automated db backups and dumps |
+
+---
+
+## Quick Start Guide
+
+### 1. Running Locally in Development Mode
+
+#### Prerequisites:
+* Node.js version 18 or higher
+* PostgreSQL database instance running locally or via Docker
+
+#### Database Configuration:
+Create a `.env` file in the root directory based on `.env.example`:
+```bash
+DATABASE_URL="postgresql://postgres:password@localhost:5432/visualerp?schema=public"
+JWT_SECRET="develop-key-change-me"
+```
+
+#### Starting the Backend:
+```bash
+# Install core workspace packages
+npm install
+
+# Push database schema & generate Prisma client
+npx prisma db push
+npx prisma generate
+
+# Populate database with sample construction mix BOM and items
+npm run db:seed
+
+# Launch backend dev server
+npm run dev
+```
+The API backend will run at `http://localhost:3000`.
+
+#### Starting the Frontend:
+In a new terminal tab:
+```bash
+cd app
+npm install
+npm run dev
+```
+The React frontend will be accessible at `http://localhost:5173`.
+
+---
+
+### 2. Running the E2E Validation Script
+We ship a programmatic E2E script [verify_e2e.ts](verify_e2e.ts) in the workspace root. It runs a full factory cycle (materials receipt, transfer, recipe completion with waste, shipment, inventory audit adjustments) and validates data accuracy:
+```bash
+npx ts-node verify_e2e.ts
+```
+
+---
+
+### 3. Production Deployment with Docker Compose
+To run the full stack as a unified containerized system:
+```bash
+# Setup production environment template
+cp .env.production.example .env
+
+# Build and start services in detached mode
+docker compose up --build -d
+```
+The application will serve static assets and proxy API endpoints on host **port 80**. Access it at `http://localhost`.
+
+---
+
+## Phase Progress & Roadmap
+
+* **Phase 0** — Repository layout, roadmaps, coding rules, and constraints setup.
+* **Phase 1** — Universal domain model, multi-tenancy design, and stock ledger specs.
+* **Phase 2** — Prisma PostgreSQL schemas, indices, and sample seeding datasets.
+* **Phase 3** — REST API contracts, standard success/error wrappers, and role matrices.
+* **Phase 4** — Fastify server setup, global tenant hook wrappers, and core master CRUD controllers.
+* **Phase 5** — Database transactional manager, ledger balance calculator, and in-process Event Bus.
+* **Phase 6** — Purchase Receipts, Transfers, and Write-off transactional routes.
+* **Phase 7** — Production completion (BOM recipes component consumption + output) and Shipment documents.
+* **Phase 8** — Inventory Audits page, counted adjustments, and stock reports.
+* **Phase 9** — Dashboard page backend aggregation, E2E curl script demo guides.
+* **Phase 10** — Frontend integration design mapping React screens to REST routes.
+* **Phase 11** — Shared fetch client, envelope parsers, organization switcher, and read-only screens.
+* **Phase 12** — Creation forms, dynamic option lists, and action mutations with idempotency.
+* **Phase 13** — Docker configurations (Fastify + Nginx reverse proxy), Fastify log redactions, VPS installation guides, backup scripts, and pilot checklists.
+* **Phase 14 (Next Phase)** — User JWT sessions, password hashing, and endpoint roles security middleware.
