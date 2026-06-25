@@ -12,7 +12,8 @@
 - **Phase 7 (Production and Shipment Workflows)**: Completed on 2026-06-25. Implemented transactional document workflows for Production Orders and Shipments. Linked Bills of Materials (BOM) and material consumption (FIFO/FEFO batch allocations) to the stock ledger, implemented finished goods output, customer shipments, and reversing cancellation logic.
 - **Phase 8 (Inventory Audits and Stock Reports)**: Completed on 2026-06-25. Implemented physical inventory audits with status transitions (DRAFT -> COUNTED -> APPROVED -> CANCELLED) and discrepancy-based stock ledger adjustments using `INVENTORY_ADJUSTMENT` movement types. Exposed read-only stock reports (matrix, per-item, per-location, historical movement logs, active batch list, and a safe low-stock limitation response until minimum stock thresholds are modeled).
 - **Phase 9 (Dashboard and MVP Demo Flow)**: Completed on 2026-06-25. Implemented real-time dashboard endpoint (`GET /api/dashboard`) returning stock summaries (dynamically calculated from movements), production/shipment/write-off monthly counts, pending document actions, and recent audit events. Created a comprehensive end-to-end MVP Demo Flow guide using `curl`.
-- **Backend/API/Frontend**: Backend core dictionaries, infrastructure, warehouse document workflows (Receipts, Transfers, Write-offs, Audits), production/shipment workflows, stock reports, and dashboard endpoints are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
+- **Phase 10 (Frontend Integration Planning)**: Completed on 2026-06-25. Prepared a detailed frontend integration plan mapping all 16 prototype screens to backend APIs, DTO contracts, required permissions, state/error lifecycle rules, and integration risks/mitigations. No code or archive changes were introduced.
+- **Backend/API/Frontend**: Backend core dictionaries, infrastructure, warehouse document workflows (Receipts, Transfers, Write-offs, Audits), production/shipment workflows, stock reports, dashboard endpoints, and frontend integration blueprints are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
 
 ## Current Product Direction
 
@@ -22,8 +23,8 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 10 — Frontend Integration Planning**
+Next recommended task: **Phase 11 — Frontend API Client and Read-Only Integration**
 
-Phase 10 will cover:
-- Planning the integration of the React frontend application with the completed backend API.
-- Mapping out authentication, tenant organization selectors, and document state workflow pages in the UI.
+Phase 11 will cover:
+- Implementing the unified Axios/fetch API client, global error handler, and react hooks in the frontend project.
+- Connecting read-only lists and dashboard cards to the real backend APIs using organizational context.

@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%209%20complete-1f6feb?style=for-the-badge" alt="Phase 9 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%2010%20complete-1f6feb?style=for-the-badge" alt="Phase 10 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -153,15 +153,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 9 |
+| Product documentation | Complete for Phase 10 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Dashboard and MVP Demo Flow complete |
+| Backend implementation | Dashboard and MVP Demo Flow complete, Frontend integration blueprint ready |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 10 - Frontend Integration Planning |
+| Next recommended phase | Phase 11 - Frontend API Client and Read-Only Integration |
 
 ## Planned Tech Direction
 
@@ -327,11 +327,20 @@ Phase 9 established:
 - database seeding improvements to include partners (Supplier and Customer) for end-to-end flows;
 - comprehensive end-to-end MVP Demo Flow guide (`docs/demo/MVP-DEMO-FLOW.md`) describing a verifiable full stock and production cycle with copy-pasteable `curl` commands.
 
+### Phase 10
+
+Phase 10 established:
+
+- comprehensive frontend integration plan (`docs/frontend/FRONTEND-INTEGRATION-PLAN.md`) detailing unified API client design, envelope parsing, and organization scoping;
+- screen-by-screen mappings (`docs/frontend/API-SCREEN-MAPPING.md`) linking all 16 prototype views to backend routes, permissions, and loading/empty/error states;
+- conceptual DTO data contracts (`docs/frontend/FRONTEND-DATA-CONTRACTS.md`) for all dashboard and document list/detail views;
+- frontend state/error guidelines (`docs/frontend/FRONTEND-STATE-AND-ERRORS.md`) and role-based permissions (`docs/frontend/FRONTEND-PERMISSIONS.md`).
+
 ## Next Step
 
-**Phase 10 - Frontend Integration Planning**
+**Phase 11 - Frontend API Client and Read-Only Integration**
 
 The next phase should define:
 
-- Planning the integration of the React frontend application with the completed backend API;
-- Mapping out authentication, tenant organization selectors, and document state workflow pages in the UI.
+- Implementing the unified Axios/fetch API client, global error handler, and react hooks in the frontend project;
+- Connecting read-only lists and dashboard cards to the real backend APIs using organizational context.

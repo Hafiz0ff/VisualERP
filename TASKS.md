@@ -14,10 +14,11 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 7 - Production and Shipment Workflows
 - [x] Phase 8 - Inventory Audits and Stock Reports
 - [x] Phase 9 - Dashboard and MVP Demo Flow
-- [ ] Phase 10 - Frontend Integration Planning
-- [ ] Phase 11 - Testing and Hardening
-- [ ] Phase 12 - Deployment
-- [ ] Phase 13 - Industry Profiles
+- [x] Phase 10 - Frontend Integration Planning
+- [ ] Phase 11 - Frontend API Client and Read-Only Integration
+- [ ] Phase 12 - Testing and Hardening
+- [ ] Phase 13 - Deployment
+- [ ] Phase 14 - Industry Profiles
 
 ## Phase Notes
 
@@ -163,6 +164,18 @@ Scope:
 - Implemented real-time dashboard endpoint `GET /api/dashboard` (under `dashboard:read` permission) aggregating stock, production, shipment, write-off metrics, and recent audit events.
 - Added Supplier and Customer sample entities seeding in `prisma/seed.ts`.
 - Created end-to-end MVP Demo Flow guide `docs/demo/MVP-DEMO-FLOW.md` detailing backend operations with copy-pasteable `curl` calls.
+
+---
+
+### Phase 10 - Frontend Integration Planning
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Prepared a comprehensive frontend integration plan (`docs/frontend/FRONTEND-INTEGRATION-PLAN.md`) outlining Axios/fetch configuration, envelope parsing, and organization context scoping.
+- Created screen-by-screen mappings (`docs/frontend/API-SCREEN-MAPPING.md`) linking all 16 prototype views to backend routes, permissions, and loading/empty/error states.
+- Documented conceptual DTO data contracts (`docs/frontend/FRONTEND-DATA-CONTRACTS.md`) for all dashboard and document list/detail views.
+- Documented frontend state/error guidelines (`docs/frontend/FRONTEND-STATE-AND-ERRORS.md`) and role-based permissions (`docs/frontend/FRONTEND-PERMISSIONS.md`).
 
 ---
 

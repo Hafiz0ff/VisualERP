@@ -42,6 +42,7 @@ API testing must verify route behavior, input sanitization, and security guard s
 - **Inventory Audit Tests**: Verify that audits can be updated only in `DRAFT`, counted only with explicit counted lines, approved only from `COUNTED`, and cancelled without creating negative balances when an approved surplus adjustment is neutralized.
 - **Stock Report Tests**: Verify that stock balance, movement, and batch reports derive data only from `POSTED` stock movements, respect tenant filters, and do not invent low-stock thresholds before minimum stock fields exist.
 - **Dashboard API Tests**: Verify that the dashboard endpoint (`GET /api/dashboard`) aggregates calculations dynamically, reports low stock as empty due to schema limitations, and returns recent audit events scoped to the organization.
+- **Frontend Integration Contract Tests**: When Phase 11 starts, verify that each connected read-only screen uses a registered backend route, parses the standard response envelope, sends `X-Organization-Id`, and does not call planned endpoints such as `/api/boms`, `/api/audit-logs`, or `/api/settings/*` before those routes exist.
 
 
 ### Business Flow Tests

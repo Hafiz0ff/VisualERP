@@ -601,3 +601,23 @@ interface CountInventoryAuditDTO {
 ### 5.8 Audit Log
 
 - `GET /api/audit-logs` — Expose mutation logs (Owner/Auditor roles only).
+
+---
+
+### 5.9 Frontend Integration Notes
+
+Phase 10 maps frontend screens against both current runtime routes and planned contract routes.
+
+Current read-only Phase 11 integration must use only routes registered in `src/app.ts`:
+- dictionaries: organizations, industry profiles, units, item categories, items, locations, suppliers, customers;
+- business documents: purchase receipts, transfers, write-offs, production orders, shipments, inventory audits;
+- reports and dashboard: stock reports and dashboard.
+
+The following contract groups are still planned and must not be treated as connected runtime APIs until their Fastify routes exist:
+- `GET/POST/PATCH /api/boms`;
+- `GET /api/audit-logs`;
+- `GET/PATCH /api/settings/modules`;
+- `GET/PATCH /api/settings/terminology`;
+- user invitation and role-management endpoints.
+
+Frontend screens may show disabled or "planned" placeholders for these areas, but Phase 11 must not call non-existent endpoints.

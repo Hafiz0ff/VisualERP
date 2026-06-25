@@ -33,6 +33,15 @@ Many users may be coming from Excel-style workflows. The UI should therefore:
 - validation errors should be clear and local to the field or action;
 - quantities, units, and totals should be visually hard to misread.
 
+## Backend Integration Rules
+
+- use one shared API client instead of direct `fetch` calls scattered across components;
+- all tenant-scoped requests must include the active `X-Organization-Id`;
+- lifecycle buttons must create and preserve an `Idempotency-Key` for retries of the same payload;
+- list, detail, dashboard, and report views must render loading, empty, permission-denied, and error states;
+- stock quantities shown in the UI must come from backend ledger/report endpoints, not from independent client-side stock calculations;
+- screens for planned backend routes must be visibly disabled or marked as planned instead of silently calling non-existent endpoints.
+
 ## Device Scope
 
 Desktop is the primary target for MVP. Mobile support can be added later for selected workflows such as warehouse operations and approvals.
