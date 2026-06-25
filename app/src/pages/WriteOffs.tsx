@@ -21,7 +21,7 @@ type WriteOffReasonKey = (typeof writeOffReasons)[number]['key']
 
 export default function WriteOffs() {
   const { data: writeOffsRes, refetch: refetchWriteOffs } = useApiQuery<{ data: WriteOffDetail[] }>('/api/write-offs', { params: { pageSize: 100 } })
-  const { data: itemsRes } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: locationsRes } = useApiQuery<{ data: StockLocation[] }>('/api/locations')
 
   const [showForm, setShowForm] = useState(false)

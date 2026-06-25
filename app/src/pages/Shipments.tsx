@@ -21,7 +21,7 @@ interface ShItem {
 
 export default function Shipments() {
   const { data: shipmentsRes, loading: loadingShipments, error: errorShipments, refetch: refetchShipments } = useApiQuery<{ data: ShipmentDetail[] }>('/api/shipments', { params: { pageSize: 100 } })
-  const { data: itemsRes, loading: loadingItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes, loading: loadingItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
   const { data: locationsRes, loading: loadingLocations } = useApiQuery<{ data: StockLocation[] }>('/api/locations')
   const { data: customersRes, loading: loadingCustomers } = useApiQuery<{ data: Customer[] }>('/api/customers')

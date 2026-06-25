@@ -22,7 +22,7 @@ interface LocalCountLine {
 export default function InventoryAudits() {
   const { data: auditsRes, loading: loadingAudits, error: errorAudits, refetch: refetchAudits } = useApiQuery<{ data: InventoryAuditDetail[] }>('/api/inventory-audits', { params: { pageSize: 100 } })
   const { data: locationsRes, loading: loadingLocations } = useApiQuery<{ data: StockLocation[] }>('/api/locations')
-  const { data: itemsRes, loading: loadingItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes, loading: loadingItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes, refetch: refetchBalances } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
 
   const [showForm, setShowForm] = useState(false)

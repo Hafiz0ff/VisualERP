@@ -22,7 +22,7 @@ interface InItem {
 
 export default function IncomingMaterials() {
   const { data: receiptsRes, refetch: refetchReceipts } = useApiQuery<{ data: PurchaseReceiptDetail[] }>('/api/purchase-receipts', { params: { pageSize: 100 } })
-  const { data: itemsRes } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
   const { data: locationsRes } = useApiQuery<{ data: StockLocation[] }>('/api/locations')
   const { data: suppliersRes } = useApiQuery<{ data: Supplier[] }>('/api/suppliers')

@@ -7,7 +7,7 @@ import type { Item as BackendItem, StockBalanceRow, ProductionOrderDetail } from
 import { Factory, AlertTriangle, Package, FlaskConical } from 'lucide-react'
 
 export default function Workshop() {
-  const { data: itemsRes, loading: loadingItems, error: errorItems, refetch: refetchItems } = useApiQuery<{ data: BackendItem[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes, loading: loadingItems, error: errorItems, refetch: refetchItems } = useApiQuery<{ data: BackendItem[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes, loading: loadingBalances, error: errorBalances, refetch: refetchBalances } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
   const { data: prodOrdersRes, loading: loadingProd, error: errorProd, refetch: refetchProd } = useApiQuery<{ data: ProductionOrderDetail[] }>('/api/production-orders', { params: { pageSize: 100 } })
 

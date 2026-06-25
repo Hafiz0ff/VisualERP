@@ -33,8 +33,8 @@ Since authentication is deferred to future stages:
 The following screens have been integrated with backend data:
 
 - **Dashboard**: Connected to `GET /api/dashboard`. Displays live stock metrics, monthly order counters, pending document summaries, and recent activity logs.
-- **Raw Materials**: Connected to `GET /api/items?pageSize=1000` and `GET /api/stock/balances`. Maps active items to warehouse/workshop stock levels.
-- **Products**: Connected to `GET /api/items?pageSize=1000`, `GET /api/stock/balances`, and completed production orders history to calculate daily/monthly output numbers.
+- **Raw Materials**: Connected to `GET /api/items?pageSize=100` and `GET /api/stock/balances`. Maps active items to warehouse/workshop stock levels.
+- **Products**: Connected to `GET /api/items?pageSize=100`, `GET /api/stock/balances`, and completed production orders history to calculate daily/monthly output numbers.
 - **Incoming Materials**: Connected to `GET /api/purchase-receipts`. List displays receipt dates, total cost, supplier details, and item breakdowns.
 - **Transfers**: Connected to `GET /api/transfers`. Clicking a row lazily fetches transfers detail lines from `GET /api/transfers/:id`.
 - **Production**: Connected to `GET /api/production-orders`. Lazily loads production details (consumptions and batch specifications) from `GET /api/production-orders/:id`.

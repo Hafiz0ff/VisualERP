@@ -21,7 +21,7 @@ interface ItemRow {
 
 export default function Transfers() {
   const { data: transfersRes, refetch: refetchTransfers } = useApiQuery<{ data: TransferDetail[] }>('/api/transfers', { params: { pageSize: 100 } })
-  const { data: itemsRes } = useApiQuery<{ data: BackendItem[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes } = useApiQuery<{ data: BackendItem[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
   const { data: batchesRes } = useApiQuery<{ data: StockBatch[] }>('/api/stock/batches')
   const { data: locationsRes } = useApiQuery<{ data: StockLocation[] }>('/api/locations')

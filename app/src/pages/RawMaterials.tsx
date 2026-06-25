@@ -21,7 +21,7 @@ export interface RawMaterial {
 }
 
 export default function RawMaterials() {
-  const { data: itemsRes, loading: loadingItems, error: errorItems, refetch: refetchItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 1000 } })
+  const { data: itemsRes, loading: loadingItems, error: errorItems, refetch: refetchItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
   const { data: balancesRes, loading: loadingBalances, error: errorBalances, refetch: refetchBalances } = useApiQuery<{ data: StockBalanceRow[] }>('/api/stock/balances')
   const { data: batchesRes, loading: loadingBatches, error: errorBatches, refetch: refetchBatches } = useApiQuery<{ data: StockBatch[] }>('/api/stock/batches')
 
