@@ -27,7 +27,9 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export function createServer(): FastifyInstance {
   const app = Fastify({
-    logger: true,
+    logger: {
+      redact: ['req.headers.authorization', 'req.body.password', 'req.body.passwordHash'],
+    },
     genReqId: (req) => (req.headers['x-request-id'] as string) || randomUUID(),
   });
 

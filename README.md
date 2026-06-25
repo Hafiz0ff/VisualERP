@@ -153,7 +153,7 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete through Phase 12 |
+| Product documentation | Complete through Phase 13 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
@@ -162,7 +162,8 @@ Purchase receipt
 | Initial Prisma schema | Complete |
 | Frontend application | Read-only API integration and core mutation/lifecycle flows connected |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 13 - Testing and Hardening |
+| Next recommended phase | Phase 14 - Security, Auth & Roles Enforcement |
+
 
 ## Planned Tech Direction
 
@@ -184,6 +185,7 @@ Framework-level decisions can be finalized in the next phases now that the domai
 | --- | --- |
 | [`docs/PROJECT-CONTEXT.md`](docs/PROJECT-CONTEXT.md) | Why the project exists and what problem it solves |
 | [`docs/STATUS.md`](docs/STATUS.md) | Current repository and phase status |
+| [`docs/RELEASE-NOTES.md`](docs/RELEASE-NOTES.md) | Versioned MVP release notes and beta boundaries |
 | [`docs/product/`](docs/product) | Product requirements, roles, processes, modules |
 | [`docs/architecture/`](docs/architecture) | System architecture, conceptual data model, API, security, offline, finance |
 | [`docs/engineering/`](docs/engineering) | Engineering rules, testing, performance, UI principles |
@@ -355,12 +357,21 @@ Phase 12 established:
 - inventory audit page covering draft creation, physical count entry, approval, cancellation, and stock balance refresh;
 - backend auto-resolution of a single active BOM for a production target item when `bomId` is omitted, with explicit conflict handling for inconsistent multiple-active-BOM data.
 
+### Phase 13
+
+Phase 13 established:
+
+- **E2E Validation script**: Created a comprehensive programmatic workflow script (`verify_e2e.ts`) validating the entire lifecycle (purchase receipt, transfer, production order consumption/output, customer shipment, inventory audit discrepancy counts, and dashboard events).
+- **Containerization**: Configured multi-stage Dockerfiles for frontend (Nginx serving assets & reverse proxying `/api` to backend) and backend (Fastify API running Prisma Client), managed via a clean, unified `docker-compose.yml` file.
+- **Observability Hardening**: Redacted sensitive payload parameters (like `Authorization` headers, `password`, and `passwordHash`) in backend Fastify logger settings.
+- **Operations Documentation**: Created server deployment (`INSTALL.md`), database migration (`UPDATE.md`), backup automation (`BACKUP.md`), and disaster recovery (`RESTORE.md`) guides under `docs/deployment/`, along with a QA report (`MVP-QA-REPORT.md`) and pilot checklist.
+
 ## Next Step
 
-**Phase 13 - Testing and Hardening**
+**Phase 14 - Security, Auth & Roles Enforcement**
 
 The next phase should define:
 
-- automated end-to-end checks for create/post/cancel/ship/count/approve flows;
-- negative-path validation tests for permissions, organization scoping, idempotency conflicts, stock shortages, and invalid lifecycle transitions;
-- focused frontend hardening for mutation error states and retry behavior.
+- real JWT-based session authentication with password hashing;
+- role-based permission guard middleware enforcement on all backend routes;
+- frontend routing guards for login views and screen permission capabilities.

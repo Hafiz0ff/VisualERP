@@ -15,7 +15,8 @@
 - **Phase 10 (Frontend Integration Planning)**: Completed on 2026-06-25. Prepared a detailed frontend integration plan mapping all 16 prototype screens to backend APIs, DTO contracts, required permissions, state/error lifecycle rules, and integration risks/mitigations. No code or archive changes were introduced.
 - **Phase 11 (Frontend API Client and Read-Only Integration)**: Completed on 2026-06-25. Implemented shared fetch-based API client, envelop parser, toast error handling, active organization dropdown switcher, mapper conversions, and connected all list/detail views (Dashboard, Raw Materials, Products, Receipts, Transfers, Production, Shipments, Write-offs, Workshop, Reports, AuditLog) as read-only.
 - **Phase 12 (Frontend Mutations and Lifecycle Actions)**: Completed on 2026-06-25. Connected all creation forms, dynamic dropdown loaders (suppliers, customers, warehouses, workshops), and lifecycle mutation actions (post, cancel, start, complete, ship, count, approve) with confirmation overlays and centralized idempotency keys. Created a new Inventory Audits page.
-- **Backend/API/Frontend**: Backend services, schema, dictionary CRUDs, warehouse documents, report queries, real-time dashboard endpoints, and frontend client integration are complete and compile cleanly.
+- **Phase 13 (MVP Hardening, QA & Pilot Readiness)**: Completed on 2026-06-25. Created programmatic E2E verification script validating all business document lifecycles, stock movements, and dashboard metrics. Built multi-stage Dockerfiles for frontend and backend, managed via a unified `docker-compose.yml` stack. Audited edge cases (non-negative validations, workshop-scoped PO consumptions), secured logging endpoints with fastify redaction rules, and added deployment, upgrade, backup, and restore documentation.
+- **Backend/API/Frontend**: Complete MVP release (`v0.9.0-beta`) verified and compiled cleanly on both frontend and backend.
 
 ## Current Product Direction
 
@@ -25,8 +26,9 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 13 — Testing and Hardening**
+Next recommended task: **Phase 14 — Security, Auth & Roles Enforcement**
 
-Phase 13 will cover:
-- Automated end-to-end testing of write operations and error handling.
-- Boundary value validation and system resilience testing.
+Phase 14 will cover:
+- Real JWT-based user authentication and secure password hashing.
+- Active role-based permission checks and route guards.
+- Frontend screen permission limits and navigation guards.

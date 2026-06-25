@@ -1,0 +1,8 @@
+node_modules
+dist
+app
+.git
+.env
+README.md
+docs
+*.zip

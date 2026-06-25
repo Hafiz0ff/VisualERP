@@ -324,7 +324,7 @@ export class ProductionOrdersService {
             const allocations = await BatchResolverService.resolveBatches(
               organizationId,
               line.itemId,
-              data.productionLocationId,
+              order.workshopLocationId,
               line.quantity,
               'FIFO'
             );
@@ -370,7 +370,7 @@ export class ProductionOrdersService {
           const allocations = await BatchResolverService.resolveBatches(
             organizationId,
             bomLine.inputItemId,
-            data.productionLocationId,
+            order.workshopLocationId,
             requiredQty,
             'FIFO'
           );
@@ -391,7 +391,7 @@ export class ProductionOrdersService {
         await StockAvailabilityService.assertAvailable(
           organizationId,
           line.itemId,
-          data.productionLocationId,
+          order.workshopLocationId,
           line.quantity,
           line.batchId
         );
@@ -429,7 +429,7 @@ export class ProductionOrdersService {
         batchId: line.batchId,
         quantity: line.quantity, // StockLedgerService expects positive, sourceLocationId does the deduction
         unitId: line.unitId,
-        sourceLocationId: data.productionLocationId,
+        sourceLocationId: order.workshopLocationId,
         targetLocationId: null,
       }));
 
@@ -482,7 +482,7 @@ export class ProductionOrdersService {
           batchId: line.batchId,
           quantity: line.quantity,
           unitId: line.unitId,
-          sourceLocationId: data.productionLocationId,
+          sourceLocationId: order.workshopLocationId,
           consumedByUserId: effectiveUserId,
           timestamp,
         })),

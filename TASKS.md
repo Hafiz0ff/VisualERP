@@ -17,8 +17,8 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 10 - Frontend Integration Planning
 - [x] Phase 11 - Frontend API Client and Read-Only Integration
 - [x] Phase 12 - Frontend Mutations and Lifecycle Actions
-- [ ] Phase 13 - Testing and Hardening
-- [ ] Phase 14 - Deployment
+- [x] Phase 13 - Testing and Hardening
+- [ ] Phase 14 - Security, Auth & Roles Enforcement
 - [ ] Phase 15 - Industry Profiles
 
 ## Phase Notes
@@ -206,6 +206,18 @@ Scope:
 - Registered a brand new "Inventory Audits" page in the sidebar and layout structure.
 - Wired all lifecycle state transitions (post, cancel, start, complete, ship, count, approve) using confirmation modal dialog overlays.
 - Tested end-to-end integration and resolved type safety across the application.
+
+### Phase 13 - Testing and Hardening
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Created programmatic E2E workflow script (`verify_e2e.ts`) validating document lifecycles, stock movements, discrepancy adjustments, audit logging, and dashboard updates.
+- Designed multi-stage Dockerfiles for backend (Node/Fastify) and frontend (Nginx reverse proxying to backend).
+- Configured unified orchestration via `docker-compose.yml` with health checks and data volumes.
+- Secured backend logging using Fastify configuration to redact sensitive request properties (Authorization, passwords).
+- Created VPS deployment guide (`INSTALL.md`), update guide (`UPDATE.md`), backup automation (`BACKUP.md`), and disaster recovery guide (`RESTORE.md`).
+- Documented pilot readiness checklist, MVP QA report, and current known limitations.
 
 ---
 
