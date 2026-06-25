@@ -49,9 +49,11 @@ Use end-to-end or workflow tests for the core operational cycle:
 - warehouse transfer;
 - write-off posting and cancellation;
 - production order;
+- BOM-based production completion with material consumption and finished goods output;
 - consumption;
 - finished goods output;
 - shipment;
+- shipment shipping and cancellation;
 - write-off;
 - reporting visibility.
 

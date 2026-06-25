@@ -49,7 +49,12 @@ All stock movements follow a positive-quantity convention:
 - **Receipts**: targetLocationId = locationId (incoming, increases stock).
 - **Transfers**: sourceLocationId = sourceLocation, targetLocationId = targetLocation (decreases source, increases target).
 - **Write-offs**: sourceLocationId = locationId (outgoing, decreases stock).
+- **Production Consumption**: sourceLocationId = productionLocationId, targetLocationId = null (outgoing, decreases ingredient stock).
+- **Production Output**: sourceLocationId = null, targetLocationId = productionLocationId (incoming, increases finished product stock).
+- **Shipments**: sourceLocationId = shipmentLocationId, targetLocationId = null (outgoing, decreases shipped goods stock).
 
 When a posted document is cancelled:
 - The system calls `StockLedgerService.cancelMovement`, which transitions the status of the associated `StockMovement` to `CANCELLED`.
 - Since dynamic balances only query movements with `POSTED` status, this cancellation instantly neutralizes the stock changes, correcting balances back to their original state.
+- For Production Orders, cancellation neutralizes both the `PRODUCTION_CONSUMPTION` and `PRODUCTION_OUTPUT` movements.
+- For Shipments, cancellation neutralizes the `SHIPMENT` movement.

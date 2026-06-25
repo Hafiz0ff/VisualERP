@@ -48,9 +48,7 @@ Permissions are grouped by modules and control access to data actions.
 - `production_orders:create` — Create planned production orders.
 - `production_orders:update` — Edit planned production details.
 - `production_orders:start` — Move order to `IN_PROGRESS`.
-- `production_orders:consume` — Log raw material consumption.
-- `production_orders:output` — Log finished product output.
-- `production_orders:complete` — Close order (summarize costs).
+- `production_orders:complete` — Complete order, consuming materials and adding finished output.
 - `production_orders:cancel` — Cancel order.
 
 ### 1.6 Shipments Module
@@ -104,7 +102,6 @@ VisualERP uses Role-Based Access Control (RBAC). Below is the mapping of permiss
 | `production_orders:read` | ✔ | ✔ | ✘ | ✔ | ✘ | ✔ |
 | `production_orders:create`/`update` | ✔ | ✔ | ✘ | ✔ | ✘ | ✘ |
 | `production_orders:start`/`complete`| ✔ | ✔ | ✘ | ✔ | ✘ | ✘ |
-| `production_orders:consume`/`output`| ✔ | ✔ | ✘ | ✔ | ✘ | ✘ |
 | `production_orders:cancel` | ✔ | ✔ | ✘ | ✔ | ✘ | ✘ |
 | `shipments:read` | ✔ | ✔ | ✘ | ✘ | ✔ | ✔ |
 | `shipments:create`/`update` | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |

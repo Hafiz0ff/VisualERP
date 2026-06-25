@@ -58,6 +58,7 @@ These rules govern the development, database design, and backend implementation 
 - **Explicit Lifecycle Routing**: Document transitions (like posting or cancellation) must never be performed via general PATCH updates. Use explicit POST action routes (e.g., `/api/purchase-receipts/:id/post` or `/api/purchase-receipts/:id/cancel`).
 - **Posted Immutability**: The API controllers and service layers must block any updates (PUT/PATCH/DELETE) targeting a document with a status of `POSTED` or `CANCELLED`.
 - **Shipment Lifecycle Naming**: Shipment execution uses `SHIPPED` status and `/ship` action endpoints. Do not model shipments as generic `/post` actions in API code.
+- **Production Lifecycle Naming**: Production Orders use `/start`, `/complete`, and `/cancel`. Completion must create material-consumption and finished-output stock movements through `StockLedgerService`.
 - **Zod Validation**: All API request payloads must be strictly validated at the controller boundary using Zod schemas before being passed to domain logic.
 - **Idempotent Lifecycle Actions**: Stock-affecting lifecycle routes (`/post`, `/cancel`, `/ship`, `/complete`, `/approve`) must require `Idempotency-Key`, cache successful duplicate responses, reject same-key payload conflicts, and clear pending keys after failed handlers so safe retries are possible.
 - **Granular Permission Guards**: Every endpoint must be guarded by an authorization middleware that checks if the active user's role contains the required granular permission string (`module:action`) specified in the permissions matrix.

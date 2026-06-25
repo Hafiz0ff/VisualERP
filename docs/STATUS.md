@@ -9,7 +9,8 @@
 - **Phase 4 (Backend MVP Foundation)**: Completed on 2026-06-25. Implemented Fastify server, database-backed idempotency service, centralized error handler, tenant scoping via request context, audit/permission placeholders, Zod validation hooks, and core CRUD dictionary endpoints for Organizations, Industry Profiles, Units, Item Categories, Items, Locations, Suppliers, and Customers.
 - **Phase 5 (Backend Infrastructure & Domain Services)**: Completed on 2026-06-25. Implemented transaction manager, base repository pattern, document lifecycle assertions, concurrency-safe sequential document numbering, dynamic stock ledger calculations, stock availability checks, MANUAL/FIFO/FEFO batch allocation resolver, and transaction-safe domain event bus.
 - **Phase 6 (Business Document Workflows)**: Completed on 2026-06-25. Implemented transactional document workflows (create, update, retrieve, list, post, cancel) and stock movement adjustments for Purchase Receipts, location-to-location Transfers, and Write-offs. Enforced non-negative stock level constraints, batch registrations, and idempotency key checks.
-- **Backend/API/Frontend**: Backend core dictionaries, infrastructure primitives, and warehouse document workflows (Purchase Receipts, Transfers, Write-offs) are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
+- **Phase 7 (Production and Shipment Workflows)**: Completed on 2026-06-25. Implemented transactional document workflows for Production Orders and Shipments. Linked Bills of Materials (BOM) and material consumption (FIFO/FEFO batch allocations) to the stock ledger, implemented finished goods output, customer shipments, and reversing cancellation logic.
+- **Backend/API/Frontend**: Backend core dictionaries, infrastructure, warehouse document workflows (Receipts, Transfers, Write-offs), and production/shipment workflows are complete and compile cleanly. The frontend prototype remains archived in `ERP-прототип.zip`.
 
 ## Current Product Direction
 
@@ -19,11 +20,10 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 7 — Production and Shipment Workflows**
+Next recommended task: **Phase 8 — Inventory Audits and Stock Reports**
 
-Phase 7 will cover:
-- Implementing Bill of Materials (BOM) creation, validation, and active-status restrictions.
-- Implementing Production Order lifecycles (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED).
-- Implementing Production Consumption (allocating raw component batches via FIFO/FEFO) and Finished Goods Output.
-- Implementing Shipment workflows (SHIPPED) matching customer orders.
-- Enforcing ledger-level document immutability and reversing transaction logic.
+Phase 8 will cover:
+- Implementing physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED).
+- Implementing Inventory adjustment stock movements for discrepancies.
+- Implementing stock status and batch report endpoints.
+- Enforcing permission scopes and idempotency key requirements.

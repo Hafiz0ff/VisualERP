@@ -11,12 +11,13 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 4 - Backend MVP Foundation
 - [x] Phase 5 - Backend Infrastructure & Domain Services
 - [x] Phase 6 - Business Document Workflows
-- [ ] Phase 7 - Production and Shipment Workflows
-- [ ] Phase 8 - Frontend Integration
-- [ ] Phase 9 - Reports and Dashboard
-- [ ] Phase 10 - Testing and Hardening
-- [ ] Phase 11 - Deployment
-- [ ] Phase 12 - Industry Profiles
+- [x] Phase 7 - Production and Shipment Workflows
+- [ ] Phase 8 - Inventory Audits and Stock Reports
+- [ ] Phase 9 - Frontend Integration
+- [ ] Phase 10 - Reports and Dashboard
+- [ ] Phase 11 - Testing and Hardening
+- [ ] Phase 12 - Deployment
+- [ ] Phase 13 - Industry Profiles
 
 ## Phase Notes
 
@@ -130,14 +131,27 @@ Scope:
 
 ### Phase 7 - Production and Shipment Workflows
 
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented production order status transitions (PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED) and sequential number generation prefix `PRD`.
+- Implemented Bill of Materials (BOM) validation and fallback component consumption formulas (with `wastePercent` scaling).
+- Implemented production completion with input material deductions (via FEFO/FIFO batch resolvers) and finished goods output additions.
+- Implemented shipments matching sales orders (DRAFT -> SHIPPED -> CANCELLED) with sequential prefix `SHP`.
+- Enforced compensating cancellation stock checks on production cancellation.
+- Enforced tenant organization scoping and request idempotency key checks.
+
+---
+
+### Phase 8 - Inventory Audits and Stock Reports
+
 Status: next recommended task.
 
 Planned outcomes:
-- Implement Bill of Materials (BOM) validation, activation, and item component configurations.
-- Implement Production Order workflows and states (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED).
-- Implement component consumption (FIFO/FEFO batch resolutions) and finished goods output ledger movements.
-- Implement Shipments matching customer sales.
-- Enforce transactional rollbacks and ledger immutability constraints.
+- Implement physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED).
+- Implement discrepancy-based stock ledger adjustments.
+- Implement stock balance reports and batch status reports.
+- Enforce permission scopes and idempotency checks.
 
 ---
 

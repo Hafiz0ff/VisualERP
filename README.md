@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%206%20complete-1f6feb?style=for-the-badge" alt="Phase 6 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%207%20complete-1f6feb?style=for-the-badge" alt="Phase 7 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -42,7 +42,7 @@ The first prototype context is a **dry construction mixes workshop**, but the sy
 - подстраивать названия и состав разделов под конкретное производство;
 - не допускать расхождения между документами и складскими остатками.
 
-Текущая версия уже содержит основу серверной части и первые рабочие складские документы: поступления, перемещения и списания. Остатки считаются не вручную, а по журналу проведённых движений, поэтому система сохраняет проверяемую историю вместо скрытого изменения чисел.
+Текущая версия уже содержит основу серверной части, первые складские документы, производственные заказы и отгрузки. Остатки считаются не вручную, а по журналу проведённых движений, поэтому система сохраняет проверяемую историю вместо скрытого изменения чисел.
 
 ## Product Positioning
 
@@ -153,15 +153,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 6 |
+| Product documentation | Complete for Phase 7 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Business Document Workflows complete |
+| Backend implementation | Production & Shipment Workflows complete |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 7 - Production and Shipment Workflows |
+| Next recommended phase | Phase 8 - Inventory Audits and Stock Reports |
 
 ## Planned Tech Direction
 
@@ -299,14 +299,23 @@ Phase 6 established:
 - request idempotency hooks;
 - compensating cancellation checks preventing negative stock balances on reversals.
 
+### Phase 7
+
+Phase 7 established:
+
+- full REST API CRUD, start, complete, and cancel endpoints for Production Orders, linking them to BOM-based or explicit consumption and finished goods outputs;
+- full REST API CRUD, ship, and cancel endpoints for Shipments, matching customer sales;
+- dynamic FEFO/FIFO stock batch resolvers and availability checks for production material consumption and shipments;
+- compensating cancellation checks preventing negative stock levels of output products and shipped items;
+- multi-tenant scoping and idempotency key checks.
+
 ## Next Step
 
-**Phase 7 - Production and Shipment Workflows**
+**Phase 8 - Inventory Audits and Stock Reports**
 
 The next phase should define:
 
-- Bill of Materials (BOM) creation and active-status validation;
-- Production Order workflows and state machines (DRAFT -> PLANNED -> IN_PROGRESS -> COMPLETED -> CANCELLED);
-- component consumption (FIFO/FEFO batch allocations) and finished goods output movements;
-- Customer shipment workflows matching sales orders;
-- ledger-level reversing logic and immutability controls.
+- physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED);
+- discrepancy-based stock ledger adjustments;
+- stock balance reports and batch status reports;
+- permission scopes and idempotency checks.

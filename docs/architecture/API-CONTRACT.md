@@ -345,44 +345,33 @@ interface BOMResponseDTO {
 - `GET /api/production-orders/:id` — Get order details.
 - `PATCH /api/production-orders/:id` — Edit planned order.
 - `POST /api/production-orders/:id/start` — Start order (status -> `IN_PROGRESS`).
-- `POST /api/production-orders/:id/consume` — Record raw material consumption.
-- `POST /api/production-orders/:id/output` — Record produced outputs.
-- `POST /api/production-orders/:id/complete` — Complete order. (Requires `Idempotency-Key`)
+- `POST /api/production-orders/:id/complete` — Complete order, posting materials consumed and outputs produced. (Requires `Idempotency-Key`)
 - `POST /api/production-orders/:id/cancel` — Cancel order. (Requires `Idempotency-Key`)
 
 ##### DTO Mappings:
 ```typescript
 // Create DTO (POST /api/production-orders)
 interface CreateProductionOrderDTO {
-  orderNumber: string;
   targetItemId: string;
   plannedQuantity: number;
   targetUnitId: string;
-  bomId?: string; // Optional (Manual mode if null)
+  bomId?: string; // Optional
   workshopLocationId: string;
   scheduledDate: string;
 }
 
-// Consume DTO (POST /api/production-orders/:id/consume)
-interface ProductionConsumeDTO {
-  itemId: string;
-  batchId?: string;
-  quantity: number;
-  unitId: string;
-  sourceLocationId: string; // workshop location
-  timestamp: string;
-}
-
-// Output DTO (POST /api/production-orders/:id/output)
-interface ProductionOutputDTO {
-  itemId: string;
-  quantity: number;
-  unitId: string;
-  targetLocationId: string;
-  batchNumber: string; // Created batch number
-  expirationDate?: string;
-  costPerUnit?: number;
-  timestamp: string;
+// Complete DTO (POST /api/production-orders/:id/complete)
+interface CompleteProductionOrderDTO {
+  actualQuantity: number;
+  outputBatchNumber: string;
+  outputExpirationDate?: string;
+  productionLocationId: string;
+  consumptionLines?: {
+    itemId: string;
+    quantity: number;
+    unitId: string;
+    batchId?: string;
+  }[];
 }
 ```
 
