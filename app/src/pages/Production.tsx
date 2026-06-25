@@ -68,8 +68,8 @@ export default function Production() {
   const finishedProducts = mapFinishedProducts(finishedOnly, balancesRes?.data || [])
 
   // Filter stock locations
-  const workshops = (locationsRes?.data || []).filter((l) => l.isActive && l.locationType === 'WORKSHOP')
-  const warehouses = (locationsRes?.data || []).filter((l) => l.isActive && l.locationType === 'WAREHOUSE')
+  const workshops = (locationsRes?.data || []).filter((l) => l.isActive && (l.locationType || l.type) === 'WORKSHOP')
+  const warehouses = (locationsRes?.data || []).filter((l) => l.isActive && (l.locationType || l.type) === 'WAREHOUSE')
 
   const productionOrders = (prodOrdersRes?.data || []).map(mapProductionOrder)
   const detailOrder = orderDetailRes ? mapProductionOrder(orderDetailRes) : null

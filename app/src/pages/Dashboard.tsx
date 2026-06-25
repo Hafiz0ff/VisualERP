@@ -19,7 +19,8 @@ const rawMaterialDist = [
 ]
 
 export default function Dashboard() {
-  const { data: dashboardData, loading, error, refetch } = useApiQuery<DashboardResponse>('/api/dashboard')
+  const { data: dashboardResponse, loading, error, refetch } = useApiQuery<{ data: DashboardResponse }>('/api/dashboard')
+  const dashboardData = dashboardResponse?.data || null
   
   const s = mapDashboardStats(dashboardData)
   const lowStock = dashboardData?.lowStockItems || []

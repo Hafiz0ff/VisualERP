@@ -165,14 +165,14 @@ export default function Transfers() {
               <label className="text-[12px] text-[#5E5E5E] block mb-1">Откуда (Склад-источник)</label>
               <select value={sourceLocationId} onChange={(e) => setSourceLocationId(e.target.value)} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded focus:outline-none">
                 <option value="">Выберите склад...</option>
-                {locations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.locationType})</option>)}
+                {locations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.locationType || l.type})</option>)}
               </select>
             </div>
             <div>
               <label className="text-[12px] text-[#5E5E5E] block mb-1">Куда (Склад-получатель)</label>
               <select value={targetLocationId} onChange={(e) => setTargetLocationId(e.target.value)} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded focus:outline-none">
                 <option value="">Выберите склад...</option>
-                {locations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.locationType})</option>)}
+                {locations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.locationType || l.type})</option>)}
               </select>
             </div>
             <div><label className="text-[12px] text-[#5E5E5E] block mb-1">Ответственный</label><input type="text" value={responsible} onChange={(e) => setResponsible(e.target.value)} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded focus:outline-none" /></div>

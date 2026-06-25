@@ -47,7 +47,7 @@ export default function IncomingMaterials() {
     balancesRes?.data || []
   )
 
-  const locations = (locationsRes?.data || []).filter((l) => l.isActive && l.locationType === 'WAREHOUSE')
+  const locations = (locationsRes?.data || []).filter((l) => l.isActive && (l.locationType || l.type) === 'WAREHOUSE')
   const suppliers = suppliersRes?.data || []
   const incomingDocuments = (receiptsRes?.data || []).map(mapPurchaseReceipt)
 

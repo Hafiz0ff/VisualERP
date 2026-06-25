@@ -17,6 +17,7 @@ import { customersRoutes } from './modules/customers/customers.routes';
 import { purchaseReceiptsRoutes } from './modules/purchase-receipts/purchase-receipts.routes';
 import { transfersRoutes } from './modules/transfers/transfers.routes';
 import { writeOffsRoutes } from './modules/write-offs/write-offs.routes';
+import { bomsRoutes } from './modules/boms/boms.routes';
 import { productionOrdersRoutes } from './modules/production-orders/production-orders.routes';
 import { shipmentsRoutes } from './modules/shipments/shipments.routes';
 import { inventoryAuditsRoutes } from './modules/inventory-audits/inventory-audits.routes';
@@ -88,6 +89,7 @@ export function createServer(): FastifyInstance {
   app.register(purchaseReceiptsRoutes, { prefix: '/api/purchase-receipts' });
   app.register(transfersRoutes, { prefix: '/api/transfers' });
   app.register(writeOffsRoutes, { prefix: '/api/write-offs' });
+  app.register(bomsRoutes, { prefix: '/api/boms' });
   app.register(productionOrdersRoutes, { prefix: '/api/production-orders' });
   app.register(shipmentsRoutes, { prefix: '/api/shipments' });
   app.register(inventoryAuditsRoutes, { prefix: '/api/inventory-audits' });

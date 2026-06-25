@@ -66,7 +66,7 @@ export default function Shipments() {
   const detailShipment = shipmentDetailRes ? mapShipment(shipmentDetailRes) : null
 
   const customers = customersRes?.data || []
-  const locations = (locationsRes?.data || []).filter((l) => l.isActive && l.locationType === 'WAREHOUSE')
+  const locations = (locationsRes?.data || []).filter((l) => l.isActive && (l.locationType || l.type) === 'WAREHOUSE')
 
   const hChange = (i: number, f: keyof ShItem, v: unknown) => {
     const ni = [...items]

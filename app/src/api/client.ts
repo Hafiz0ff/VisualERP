@@ -9,7 +9,16 @@ type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 function buildUrl(path: string, params?: QueryParams): string {
   const urlPath = path.startsWith('/') ? path : `/${path}`;
-  const url = new URL(`${BASE_URL}${urlPath}`);
+  const baseIsAbsolute = /^https?:\/\//i.test(BASE_URL);
+  const baseEndsWithApi = BASE_URL.endsWith('/api');
+  const normalizedPath = baseEndsWithApi && urlPath.startsWith('/api/')
+    ? urlPath.slice('/api'.length)
+    : urlPath;
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+  const url = baseIsAbsolute
+    ? new URL(`${BASE_URL}${normalizedPath}`)
+    : new URL(baseEndsWithApi && urlPath.startsWith('/api/') ? urlPath : `${BASE_URL}${urlPath}`, origin);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {

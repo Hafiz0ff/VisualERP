@@ -240,7 +240,7 @@ export default function InventoryAudits() {
               <select value={locationId} onChange={(e) => handleLocationChange(e.target.value)} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded focus:outline-none focus:border-[#C0563F]">
                 <option value="">Выберите склад...</option>
                 {locations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>{loc.name} ({loc.locationType === 'WORKSHOP' ? 'Цех' : 'Склад'})</option>
+                  <option key={loc.id} value={loc.id}>{loc.name} ({(loc.locationType || loc.type) === 'WORKSHOP' ? 'Цех' : 'Склад'})</option>
                 ))}
               </select>
             </div>

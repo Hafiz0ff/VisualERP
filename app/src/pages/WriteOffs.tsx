@@ -149,7 +149,10 @@ export default function WriteOffs() {
               <label className="text-[12px] text-[#5E5E5E] block mb-1">Склад списания</label>
               <select value={locationId} onChange={(e) => setLocationId(e.target.value)} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded focus:outline-none">
                 <option value="">Выберите склад...</option>
-                {locations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.locationType === 'WORKSHOP' ? 'Цех' : 'Склад'})</option>)}
+                {locations.map((l) => {
+                  const kind = l.locationType || l.type;
+                  return <option key={l.id} value={l.id}>{l.name} ({kind === 'WORKSHOP' ? 'Цех' : 'Склад'})</option>;
+                })}
               </select>
             </div>
             <div><label className="text-[12px] text-[#5E5E5E] block mb-1">Объект списания</label><select value={targetType} onChange={(e) => { setTargetType(e.target.value as 'material' | 'product'); setTargetId('') }} className="h-9 w-full px-3 text-[13px] bg-[#F6F5F2] border border-[#D4CFC8] rounded"><option value="material">Сырьё</option><option value="product">Готовая продукция</option></select></div>

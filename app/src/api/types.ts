@@ -33,7 +33,8 @@ export interface StockLocation {
   id: string;
   name: string;
   code: string;
-  locationType: 'WAREHOUSE' | 'WORKSHOP' | 'TRANSIT' | 'CUSTOMER' | 'SUPPLIER';
+  type?: 'WAREHOUSE' | 'WORKSHOP' | 'PRODUCTION_AREA' | 'RETAIL_POINT' | 'VIRTUAL';
+  locationType?: 'WAREHOUSE' | 'WORKSHOP' | 'TRANSIT' | 'CUSTOMER' | 'SUPPLIER';
   isActive: boolean;
 }
 
@@ -56,18 +57,31 @@ export interface StockBatch {
   itemId: string;
   item: {
     name: string;
-    unit: {
+    code?: string | null;
+    unit?: {
       symbol: string;
     };
   };
+  unit?: Unit;
   batchNumber: string;
-  quantity: number;
-  initialQuantity: number;
-  costPerUnit: number;
-  receivedAt: string;
+  quantity?: number;
+  calculatedQuantity?: number;
+  initialQuantity?: number;
+  costPerUnit: number | null;
+  receivedAt?: string;
+  receivedDate?: string | null;
   expirationDate: string | null;
-  status: 'ACTIVE' | 'DEPLETED' | 'EXPIRED' | 'HOLD';
-  locationId: string;
+  status: 'ACTIVE' | 'APPROVED' | 'QUARANTINE' | 'REJECTED' | 'DEPLETED' | 'EXPIRED' | 'HOLD';
+  locationId?: string;
+  receivedLocationId?: string | null;
+  receivedLocation?: {
+    id: string;
+    name: string;
+  } | null;
+  supplier?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export interface StockMovementLine {
@@ -406,4 +420,36 @@ export interface Customer {
   id: string;
   name: string;
   code: string;
+}
+
+export interface BOMDetail {
+  id: string;
+  outputItemId: string;
+  name: string;
+  version: string;
+  isActive: boolean;
+  createdAt: string;
+  outputItem: {
+    id: string;
+    name: string;
+    code: string | null;
+  };
+  lines: {
+    id: string;
+    inputItemId: string;
+    quantity: number | string;
+    unitId: string;
+    wastePercent: number | string | null;
+    notes: string | null;
+    inputItem: {
+      id: string;
+      name: string;
+      code: string | null;
+    };
+    unit: {
+      id: string;
+      name: string;
+      symbol: string;
+    };
+  }[];
 }

@@ -44,11 +44,11 @@ interface AuditEvent {
 }
 
 export default function AuditLog() {
-  const { data: dashboardRes, loading, error, refetch } = useApiQuery<{ recentAuditEvents: AuditEvent[] }>('/api/dashboard')
+  const { data: dashboardRes, loading, error, refetch } = useApiQuery<{ data: { recentAuditEvents: AuditEvent[] } }>('/api/dashboard')
   const [search, setSearch] = useState('')
   const [docFilter, setDocFilter] = useState('all')
 
-  const rawEvents = dashboardRes?.recentAuditEvents || []
+  const rawEvents = dashboardRes?.data.recentAuditEvents || []
 
   const mappedEvents = rawEvents.map((e) => ({
     id: e.id,
