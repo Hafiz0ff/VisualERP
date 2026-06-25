@@ -59,6 +59,7 @@ These rules govern the development, database design, and backend implementation 
 - **Posted Immutability**: The API controllers and service layers must block any updates (PUT/PATCH/DELETE) targeting a document with a status of `POSTED` or `CANCELLED`.
 - **Shipment Lifecycle Naming**: Shipment execution uses `SHIPPED` status and `/ship` action endpoints. Do not model shipments as generic `/post` actions in API code.
 - **Production Lifecycle Naming**: Production Orders use `/start`, `/complete`, and `/cancel`. Completion must create material-consumption and finished-output stock movements through `StockLedgerService`.
+- **Inventory Audit Lifecycle**: Inventory Audits use `/count`, `/approve`, and `/cancel`. Updating audit content is allowed only while status is `DRAFT`; `COUNTED` records are locked until approval or cancellation.
 - **Zod Validation**: All API request payloads must be strictly validated at the controller boundary using Zod schemas before being passed to domain logic.
 - **Idempotent Lifecycle Actions**: Stock-affecting lifecycle routes (`/post`, `/cancel`, `/ship`, `/complete`, `/approve`) must require `Idempotency-Key`, cache successful duplicate responses, reject same-key payload conflicts, and clear pending keys after failed handlers so safe retries are possible.
 - **Granular Permission Guards**: Every endpoint must be guarded by an authorization middleware that checks if the active user's role contains the required granular permission string (`module:action`) specified in the permissions matrix.
@@ -70,6 +71,7 @@ These rules govern the development, database design, and backend implementation 
 
 - **Boundary Validation**: Validate all inputs at the API controller boundaries before they reach domain services. Use Zod schemas matching the database structures.
 - **Non-Negative Invariant**: The calculated stock balance for any `Item` inside a `StockLocation` for a specific `StockBatch` should not fall below zero. Validate stock availability before posting any stock-reduction documents.
+- **No Invented Stock Thresholds**: Do not calculate low-stock alerts from arbitrary constants. Until minimum stock thresholds are modeled explicitly, low-stock endpoints must return a documented limitation or an empty safe result.
 - **Unit Matching**: Ensure that transaction units match the base unit of the item, or verify that a valid `UnitConversion` mapping exists.
 - **Tenant-Membership Invariant**: `organizationId` selection from headers or route params must be validated against `UserOrganizationMembership` before processing any action.
 

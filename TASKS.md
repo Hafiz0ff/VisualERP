@@ -12,7 +12,7 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 5 - Backend Infrastructure & Domain Services
 - [x] Phase 6 - Business Document Workflows
 - [x] Phase 7 - Production and Shipment Workflows
-- [ ] Phase 8 - Inventory Audits and Stock Reports
+- [x] Phase 8 - Inventory Audits and Stock Reports
 - [ ] Phase 9 - Frontend Integration
 - [ ] Phase 10 - Reports and Dashboard
 - [ ] Phase 11 - Testing and Hardening
@@ -145,13 +145,13 @@ Scope:
 
 ### Phase 8 - Inventory Audits and Stock Reports
 
-Status: next recommended task.
+Status: completed on 2026-06-25.
 
-Planned outcomes:
-- Implement physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED).
-- Implement discrepancy-based stock ledger adjustments.
-- Implement stock balance reports and batch status reports.
-- Enforce permission scopes and idempotency checks.
+Scope:
+- Implemented physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED) with sequential prefix `INV`.
+- Implemented discrepancy-based stock ledger adjustments using `INVENTORY_ADJUSTMENT` movement types.
+- Implemented stock balance reports (matrix, per-item, per-location), historical movement logs, active batch list, and a safe low-stock limitation response until minimum stock thresholds are modeled.
+- Enforced permission scopes and idempotency checks.
 
 ---
 

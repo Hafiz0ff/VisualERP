@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%207%20complete-1f6feb?style=for-the-badge" alt="Phase 7 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%208%20complete-1f6feb?style=for-the-badge" alt="Phase 8 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -153,15 +153,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 7 |
+| Product documentation | Complete for Phase 8 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Production & Shipment Workflows complete |
+| Backend implementation | Inventory Audits and Stock Reports complete |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 8 - Inventory Audits and Stock Reports |
+| Next recommended phase | Phase 9 - Frontend Integration |
 
 ## Planned Tech Direction
 
@@ -309,13 +309,21 @@ Phase 7 established:
 - compensating cancellation checks preventing negative stock levels of output products and shipped items;
 - multi-tenant scoping and idempotency key checks.
 
+### Phase 8
+
+Phase 8 established:
+
+- full REST API CRUD, count, approve, and cancel endpoints for Inventory Audits, enabling physical stock counts reconciliation;
+- discrepancy-based stock ledger adjustments using `INVENTORY_ADJUSTMENT` movement types;
+- read-only stock reports including matrix balance sheets, per-item, and per-location status pages;
+- historical movement logs with filtering, active batch registers, and a safe documented low-stock limitation until minimum stock thresholds are modeled;
+- permission scopes and idempotency hooks.
+
 ## Next Step
 
-**Phase 8 - Inventory Audits and Stock Reports**
+**Phase 9 - Frontend Integration**
 
 The next phase should define:
 
-- physical Inventory Audits (DRAFT -> COUNTED -> APPROVED -> CANCELLED);
-- discrepancy-based stock ledger adjustments;
-- stock balance reports and batch status reports;
-- permission scopes and idempotency checks.
+- Connecting the frontend prototype or creating the React application using the modular API;
+- Integrating authentication, organization selectors, and document dashboards.

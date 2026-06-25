@@ -46,54 +46,60 @@ The system supports predefined system roles that cannot be deleted, plus optiona
 | :--- | :---: | :--- |
 | **Owner** | Yes | Full access, settings modification, module configuration, billing. |
 | **Warehouse Manager** | Yes | Manage inventory, post receipts, execute transfers, perform audits. |
-| **Production Supervisor**| Yes | Manage BOMs, plan/start production orders, confirm outputs. |
-| **Operator** | Yes | Record production consumptions, read items and stock balances. |
+| **Workshop Master**| Yes | Manage BOMs, plan/start production orders, confirm outputs. |
+| **Shipment Manager** | Yes | Manage customers, shipments, and shipment cancellation. |
 | **Auditor** | Yes | Read-only access to all transactional records and reports; manages Audit Logs. |
 
 ### 3.2 Granular Permissions Matrix
-Permissions follow the format `module:resource:action`. Below are examples of permissions grouped by module:
+Permissions follow the format `module:action`. Below are examples of permissions grouped by module:
 
 ```txt
 Master Data (Core):
-  - core:items:create
-  - core:items:update
-  - core:items:read
-  - core:units:manage
+  - items:read
+  - items:create
+  - items:update
+  - units:manage
+  - locations:read
+  - locations:manage
 
 Warehouse Module:
-  - warehouse:receipts:create
-  - warehouse:receipts:post
-  - warehouse:receipts:cancel
-  - warehouse:transfers:create
-  - warehouse:transfers:post
-  - warehouse:transfers:cancel
-  - warehouse:audits:manage
+  - purchase_receipts:create
+  - purchase_receipts:post
+  - purchase_receipts:cancel
+  - transfers:create
+  - transfers:post
+  - transfers:cancel
+  - inventory_audits:count
+  - inventory_audits:approve
+  - inventory_audits:cancel
 
 Production Module:
-  - production:orders:create
-  - production:orders:start
-  - production:orders:consume
-  - production:orders:output
-  - production:orders:complete
-  - production:orders:cancel
+  - production_orders:create
+  - production_orders:start
+  - production_orders:complete
+  - production_orders:cancel
 
 BOM / Recipe Module:
-  - bom:recipes:create
-  - bom:recipes:activate
+  - boms:create
+  - boms:activate
 
 Shipment Module:
-  - shipments:ship:create
-  - shipments:ship:execute
-  - shipments:ship:cancel
+  - shipments:create
+  - shipments:ship
+  - shipments:cancel
 
 Write-offs Module:
-  - writeoffs:post
-  - writeoffs:cancel
+  - write_offs:post
+  - write_offs:cancel
+
+Stock Reports:
+  - stock_reports:read
+  - stock_movements:read
+  - stock_batches:read
 
 System Settings:
-  - settings:modules:update
-  - settings:terminology:update
-  - settings:users:invite
+  - settings:manage
+  - audit_log:read
 ```
 
 ---

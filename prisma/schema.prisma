@@ -200,7 +200,7 @@ model Role {
 
 model Permission {
   id          String   @id @default(uuid())
-  code        String   @unique // e.g., "warehouse:receipts:create"
+  code        String   @unique // e.g., "purchase_receipts:create"
   description String?
   module      String // e.g., "warehouse"
   createdAt   DateTime @default(now())

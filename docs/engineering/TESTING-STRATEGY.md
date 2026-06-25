@@ -39,6 +39,8 @@ API testing must verify route behavior, input sanitization, and security guard s
   - Test sending the same key with different payloads. Verify that the server returns `IDEMPOTENCY_CONFLICT` (HTTP 409).
   - Test failed `/post` and `/cancel` attempts. Verify that pending idempotency records are cleared so the same request can be retried after the original error is fixed.
 - **Lifecycle Action Tests**: Verify that critical document status changes are rejected through generic `PATCH` payloads and accepted only through explicit action endpoints such as `/post`, `/ship`, `/complete`, `/approve`, and `/cancel`.
+- **Inventory Audit Tests**: Verify that audits can be updated only in `DRAFT`, counted only with explicit counted lines, approved only from `COUNTED`, and cancelled without creating negative balances when an approved surplus adjustment is neutralized.
+- **Stock Report Tests**: Verify that stock balance, movement, and batch reports derive data only from `POSTED` stock movements, respect tenant filters, and do not invent low-stock thresholds before minimum stock fields exist.
 
 
 ### Business Flow Tests
@@ -54,6 +56,7 @@ Use end-to-end or workflow tests for the core operational cycle:
 - finished goods output;
 - shipment;
 - shipment shipping and cancellation;
+- inventory audit counting, approval, and cancellation;
 - write-off;
 - reporting visibility.
 

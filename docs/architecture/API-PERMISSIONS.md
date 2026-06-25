@@ -30,6 +30,7 @@ Permissions are grouped by modules and control access to data actions.
 - `inventory_audits:read` — View audits.
 - `inventory_audits:create` — Create draft audits.
 - `inventory_audits:update` — Enter actual count lines in audits.
+- `inventory_audits:count` — Lock counts (status -> COUNTED).
 - `inventory_audits:approve` — Approve audits (posts adjustments).
 - `inventory_audits:cancel` — Cancel audits.
 
@@ -65,8 +66,10 @@ Permissions are grouped by modules and control access to data actions.
 - `write_offs:post` — Post write-off (decreases stock).
 - `write_offs:cancel` — Cancel write-off.
 
-### 1.8 Audit Log & Settings
-- `stock:read` — View derived stock balances, batches, and movement ledger records.
+### 1.8 Stock Reports, Audit Log & Settings
+- `stock_reports:read` — View derived stock balance reports.
+- `stock_movements:read` — View historical stock movement ledger records.
+- `stock_batches:read` — View stock batch registers and calculated batch balances.
 - `stock:post_movement` — Reserved permission for future controlled manual stock movement posting.
 - `dashboard:read` — View dashboard summary payloads.
 - `audit_log:read` — View system-wide security and mutation logs.
@@ -92,7 +95,7 @@ VisualERP uses Role-Based Access Control (RBAC). Below is the mapping of permiss
 | `transfers:create`/`update` | ✔ | ✔ | ✔ | ✔ | ✘ | ✘ |
 | `transfers:post`/`cancel` | ✔ | ✔ | ✔ | ✔ | ✘ | ✘ |
 | `inventory_audits:read` | ✔ | ✔ | ✔ | ✘ | ✘ | ✔ |
-| `inventory_audits:create`/`update` | ✔ | ✔ | ✔ | ✘ | ✘ | ✘ |
+| `inventory_audits:create`/`update`/`count` | ✔ | ✔ | ✔ | ✘ | ✘ | ✘ |
 | `inventory_audits:approve`/`cancel`| ✔ | ✔ | ✔ | ✘ | ✘ | ✘ |
 | `suppliers:manage` | ✔ | ✔ | ✔ | ✘ | ✘ | ✘ |
 | `customers:manage` | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
@@ -106,7 +109,9 @@ VisualERP uses Role-Based Access Control (RBAC). Below is the mapping of permiss
 | `shipments:read` | ✔ | ✔ | ✘ | ✘ | ✔ | ✔ |
 | `shipments:create`/`update` | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
 | `shipments:ship`/`cancel` | ✔ | ✔ | ✘ | ✘ | ✔ | ✘ |
-| `stock:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `stock_reports:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `stock_movements:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `stock_batches:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `dashboard:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `write_offs:read` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `write_offs:create`/`update` | ✔ | ✔ | ✔ | ✔ | ✔ | ✘ |

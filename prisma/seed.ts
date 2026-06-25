@@ -105,15 +105,56 @@ async function main() {
   // 5. Create Permissions
   console.log('Seeding Permissions...');
   const permissionsList = [
-    { code: 'core:items:manage', module: 'core', description: 'Create, update, and manage items' },
-    { code: 'warehouse:receipts:manage', module: 'warehouse', description: 'Create, post, and cancel purchase receipts' },
-    { code: 'warehouse:transfers:manage', module: 'warehouse', description: 'Manage inventory transfers between locations' },
-    { code: 'warehouse:audits:manage', module: 'warehouse', description: 'Perform and approve stock audits' },
-    { code: 'production:orders:manage', module: 'production', description: 'Plan, start, and complete production orders' },
-    { code: 'shipments:manage', module: 'shipments', description: 'Create, post, and cancel customer shipments' },
-    { code: 'writeoffs:manage', module: 'writeoffs', description: 'Write off damaged or defect goods' },
+    { code: 'items:read', module: 'items', description: 'View item cards and categories' },
+    { code: 'items:create', module: 'items', description: 'Create new items and categories' },
+    { code: 'items:update', module: 'items', description: 'Modify item details' },
+    { code: 'units:manage', module: 'units', description: 'View, create, and manage units and conversion rules' },
+    { code: 'locations:read', module: 'locations', description: 'View warehouses and workshops' },
+    { code: 'locations:manage', module: 'locations', description: 'Create, edit, and toggle warehouses and workshops' },
+    { code: 'purchase_receipts:read', module: 'warehouse', description: 'View purchase receipts' },
+    { code: 'purchase_receipts:create', module: 'warehouse', description: 'Create draft purchase receipts' },
+    { code: 'purchase_receipts:update', module: 'warehouse', description: 'Edit draft purchase receipts' },
+    { code: 'purchase_receipts:post', module: 'warehouse', description: 'Post purchase receipts' },
+    { code: 'purchase_receipts:cancel', module: 'warehouse', description: 'Cancel posted purchase receipts' },
+    { code: 'transfers:read', module: 'warehouse', description: 'View stock transfers' },
+    { code: 'transfers:create', module: 'warehouse', description: 'Create draft stock transfers' },
+    { code: 'transfers:update', module: 'warehouse', description: 'Edit draft stock transfers' },
+    { code: 'transfers:post', module: 'warehouse', description: 'Post stock transfers' },
+    { code: 'transfers:cancel', module: 'warehouse', description: 'Cancel posted stock transfers' },
+    { code: 'inventory_audits:read', module: 'warehouse', description: 'View inventory audits' },
+    { code: 'inventory_audits:create', module: 'warehouse', description: 'Create draft inventory audits' },
+    { code: 'inventory_audits:update', module: 'warehouse', description: 'Edit draft inventory audits' },
+    { code: 'inventory_audits:count', module: 'warehouse', description: 'Lock inventory audit counts' },
+    { code: 'inventory_audits:approve', module: 'warehouse', description: 'Approve inventory audit adjustments' },
+    { code: 'inventory_audits:cancel', module: 'warehouse', description: 'Cancel inventory audits' },
+    { code: 'suppliers:manage', module: 'partners', description: 'View and edit supplier directory' },
+    { code: 'customers:manage', module: 'partners', description: 'View and edit customer directory' },
+    { code: 'boms:read', module: 'bom', description: 'View BOM structures and versions' },
+    { code: 'boms:create', module: 'bom', description: 'Create draft BOM versions' },
+    { code: 'boms:update', module: 'bom', description: 'Edit draft BOM versions' },
+    { code: 'boms:activate', module: 'bom', description: 'Activate BOM versions' },
+    { code: 'production_orders:read', module: 'production', description: 'View production orders' },
+    { code: 'production_orders:create', module: 'production', description: 'Create planned production orders' },
+    { code: 'production_orders:update', module: 'production', description: 'Edit planned production orders' },
+    { code: 'production_orders:start', module: 'production', description: 'Start production orders' },
+    { code: 'production_orders:complete', module: 'production', description: 'Complete production orders' },
+    { code: 'production_orders:cancel', module: 'production', description: 'Cancel production orders' },
+    { code: 'shipments:read', module: 'shipments', description: 'View customer shipments' },
+    { code: 'shipments:create', module: 'shipments', description: 'Create draft shipments' },
+    { code: 'shipments:update', module: 'shipments', description: 'Edit draft shipments' },
+    { code: 'shipments:ship', module: 'shipments', description: 'Ship goods to customers' },
+    { code: 'shipments:cancel', module: 'shipments', description: 'Cancel shipments' },
+    { code: 'write_offs:read', module: 'write_offs', description: 'View write-offs' },
+    { code: 'write_offs:create', module: 'write_offs', description: 'Create draft write-offs' },
+    { code: 'write_offs:update', module: 'write_offs', description: 'Edit draft write-offs' },
+    { code: 'write_offs:post', module: 'write_offs', description: 'Post write-offs' },
+    { code: 'write_offs:cancel', module: 'write_offs', description: 'Cancel write-offs' },
+    { code: 'stock_reports:read', module: 'stock', description: 'View derived stock balance reports' },
+    { code: 'stock_movements:read', module: 'stock', description: 'View historical stock movement ledger records' },
+    { code: 'stock_batches:read', module: 'stock', description: 'View stock batch registers and calculated balances' },
+    { code: 'dashboard:read', module: 'dashboard', description: 'View dashboard summary payloads' },
+    { code: 'audit_log:read', module: 'audit', description: 'Read system audit logs' },
     { code: 'settings:manage', module: 'settings', description: 'Manage company settings and module status' },
-    { code: 'audit:read', module: 'audit', description: 'Read system audit logs' },
   ];
 
   const dbPermissions = [];
@@ -128,12 +169,45 @@ async function main() {
 
   // 6. Create Roles & Associate Permissions
   console.log('Seeding Roles...');
+  const allPermissionCodes = permissionsList.map((p) => p.code);
+  const adminPermissionCodes = allPermissionCodes.filter((code) => code !== 'settings:manage');
+  const warehousePermissionCodes = [
+    'items:read', 'items:create', 'items:update', 'units:manage', 'locations:read', 'locations:manage',
+    'purchase_receipts:read', 'purchase_receipts:create', 'purchase_receipts:update', 'purchase_receipts:post', 'purchase_receipts:cancel',
+    'transfers:read', 'transfers:create', 'transfers:update', 'transfers:post', 'transfers:cancel',
+    'inventory_audits:read', 'inventory_audits:create', 'inventory_audits:update', 'inventory_audits:count', 'inventory_audits:approve', 'inventory_audits:cancel',
+    'write_offs:read', 'write_offs:create', 'write_offs:update', 'write_offs:post', 'write_offs:cancel',
+    'stock_reports:read', 'stock_movements:read', 'stock_batches:read', 'dashboard:read',
+  ];
+  const workshopPermissionCodes = [
+    'items:read', 'locations:read',
+    'transfers:read', 'transfers:create', 'transfers:update', 'transfers:post', 'transfers:cancel',
+    'boms:read', 'boms:create', 'boms:update', 'boms:activate',
+    'production_orders:read', 'production_orders:create', 'production_orders:update', 'production_orders:start', 'production_orders:complete', 'production_orders:cancel',
+    'write_offs:read', 'write_offs:create', 'write_offs:update', 'write_offs:post', 'write_offs:cancel',
+    'stock_reports:read', 'stock_movements:read', 'stock_batches:read', 'dashboard:read',
+  ];
+  const shipmentPermissionCodes = [
+    'items:read', 'items:create', 'items:update', 'locations:read',
+    'shipments:read', 'shipments:create', 'shipments:update', 'shipments:ship', 'shipments:cancel',
+    'customers:manage', 'write_offs:read', 'write_offs:create', 'write_offs:update', 'write_offs:post', 'write_offs:cancel',
+    'stock_reports:read', 'stock_movements:read', 'stock_batches:read', 'dashboard:read',
+  ];
+  const auditorPermissionCodes = [
+    'items:read', 'locations:read',
+    'purchase_receipts:read', 'transfers:read', 'inventory_audits:read',
+    'boms:read', 'production_orders:read', 'shipments:read', 'write_offs:read',
+    'stock_reports:read', 'stock_movements:read', 'stock_batches:read',
+    'dashboard:read', 'audit_log:read',
+  ];
+
   const roleDefinitions = [
-    { name: 'Owner', description: 'Full access to organization controls and logs', isSystem: true, permCodes: permissionsList.map(p => p.code) },
-    { name: 'Admin', description: 'General administration and operation access', isSystem: true, permCodes: permissionsList.filter(p => p.code !== 'settings:manage').map(p => p.code) },
-    { name: 'Warehouse Manager', description: 'Logistics and storage management', isSystem: true, permCodes: ['core:items:manage', 'warehouse:receipts:manage', 'warehouse:transfers:manage', 'warehouse:audits:manage'] },
-    { name: 'Workshop Master', description: 'Production planning and execution management', isSystem: true, permCodes: ['production:orders:manage', 'warehouse:transfers:manage'] },
-    { name: 'Auditor', description: 'Read-only audit and report analysis access', isSystem: true, permCodes: ['audit:read'] },
+    { name: 'Owner', description: 'Full access to organization controls and logs', isSystem: true, permCodes: allPermissionCodes },
+    { name: 'Admin', description: 'General administration and operation access', isSystem: true, permCodes: adminPermissionCodes },
+    { name: 'Warehouse Manager', description: 'Logistics and storage management', isSystem: true, permCodes: warehousePermissionCodes },
+    { name: 'Workshop Master', description: 'Production planning and execution management', isSystem: true, permCodes: workshopPermissionCodes },
+    { name: 'Shipment Manager', description: 'Customer shipment execution access', isSystem: true, permCodes: shipmentPermissionCodes },
+    { name: 'Auditor', description: 'Read-only audit and report analysis access', isSystem: true, permCodes: auditorPermissionCodes },
   ];
 
   const rolesMap: { [key: string]: string } = {};

@@ -440,10 +440,10 @@ interface CreateWriteOffDTO {
 #### 5.5.7 Inventory Audits
 
 - `GET /api/inventory-audits` — List audits.
-- `POST /api/inventory-audits` — Start audit (computes system expectations).
+- `POST /api/inventory-audits` — Create a `DRAFT` audit for a stock location.
 - `GET /api/inventory-audits/:id` — Retrieve audit lines.
-- `PATCH /api/inventory-audits/:id` — Input actual quantities.
-- `POST /api/inventory-audits/:id/count` — Lock counts (status -> `COUNTED`).
+- `PATCH /api/inventory-audits/:id` — Update only a `DRAFT` audit.
+- `POST /api/inventory-audits/:id/count` — Submit counted lines and lock counts (status -> `COUNTED`). (Requires `Idempotency-Key`)
 - `POST /api/inventory-audits/:id/approve` — Approve adjustments. (Requires `Idempotency-Key`)
 - `POST /api/inventory-audits/:id/cancel` — Cancel audit. (Requires `Idempotency-Key`)
 
@@ -451,17 +451,33 @@ interface CreateWriteOffDTO {
 ```typescript
 // Create DTO (POST /api/inventory-audits)
 interface CreateInventoryAuditDTO {
-  auditNumber: string;
-  auditDate: string;
+  auditDate?: string;
   locationId: string;
-  auditorUserId: string;
+  lines?: {
+    itemId: string;
+    batchId?: string | null;
+    actualQuantity?: number;
+    unitId: string;
+  }[];
 }
 
-// Update Counts DTO (PATCH /api/inventory-audits/:id)
-interface UpdateInventoryAuditCountsDTO {
+// Update DTO (PATCH /api/inventory-audits/:id)
+interface UpdateInventoryAuditDTO {
+  auditDate?: string;
+  locationId?: string;
+  lines?: {
+    itemId: string;
+    batchId?: string | null;
+    actualQuantity: number;
+    unitId: string;
+  }[];
+}
+
+// Count DTO (POST /api/inventory-audits/:id/count)
+interface CountInventoryAuditDTO {
   lines: {
     itemId: string;
-    batchId?: string;
+    batchId?: string | null;
     actualQuantity: number;
     unitId: string;
   }[];
@@ -478,6 +494,7 @@ interface UpdateInventoryAuditCountsDTO {
 - `GET /api/stock/balances/by-location/:locationId` — Stock of all items at a specific location.
 - `GET /api/stock/movements` — Query historical stock movement ledger lines list.
 - `GET /api/stock/batches` — List active batches and their statuses.
+- `GET /api/stock/low-stock` — Returns an empty result with a documented limitation until minimum stock thresholds are modeled.
 
 *Note: All stock balance endpoints dynamically aggregate posted `StockMovementLine` quantities in the database using the formulas defined in the Stock Ledger specification, ensuring transactional accuracy.*
 
