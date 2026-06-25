@@ -15,10 +15,11 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 8 - Inventory Audits and Stock Reports
 - [x] Phase 9 - Dashboard and MVP Demo Flow
 - [x] Phase 10 - Frontend Integration Planning
-- [ ] Phase 11 - Frontend API Client and Read-Only Integration
-- [ ] Phase 12 - Testing and Hardening
-- [ ] Phase 13 - Deployment
-- [ ] Phase 14 - Industry Profiles
+- [x] Phase 11 - Frontend API Client and Read-Only Integration
+- [ ] Phase 12 - Frontend Mutations and Lifecycle Actions
+- [ ] Phase 13 - Testing and Hardening
+- [ ] Phase 14 - Deployment
+- [ ] Phase 15 - Industry Profiles
 
 ## Phase Notes
 
@@ -176,6 +177,21 @@ Scope:
 - Created screen-by-screen mappings (`docs/frontend/API-SCREEN-MAPPING.md`) linking all 16 prototype views to backend routes, permissions, and loading/empty/error states.
 - Documented conceptual DTO data contracts (`docs/frontend/FRONTEND-DATA-CONTRACTS.md`) for all dashboard and document list/detail views.
 - Documented frontend state/error guidelines (`docs/frontend/FRONTEND-STATE-AND-ERRORS.md`) and role-based permissions (`docs/frontend/FRONTEND-PERMISSIONS.md`).
+
+---
+
+### Phase 11 - Frontend API Client and Read-Only Integration
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented fetch-based modular API client config (`app/src/api/client.ts`) with configurable base URL and active organization context.
+- Implemented standard success/paginated/error response envelope parsers and typed domain errors in the frontend.
+- Added organization context selector within global `Layout.tsx` header to broadcast tenancy change events.
+- Integrated read-only hooks (`useApiQuery`) and conversion mapper methods to map backend DTO structures to frontend requirements.
+- Replaced local mocks with live API data on all 11 core screens: Dashboard, Raw Materials, Products, Incoming Materials, Transfers, Production, Shipments, Write-offs, Workshop, Reports, and AuditLog.
+- Handled UI states (loading shimmers, empty lists, error messages, and unreachable/denied warnings).
+- Kept write operations mock-based in preparation for Phase 12.
 
 ---
 

@@ -396,3 +396,9 @@ interface AuditLogItem {
   } | null;
 }
 ```
+
+---
+
+## Phase 11 Data Contracts Status
+
+Completed on 2026-06-25. Aligned all DTO schemas. Unused fields and discrepancies in nested item/unit properties have been resolved inside `documents.mapper.ts` to map live data to UI structures seamlessly.

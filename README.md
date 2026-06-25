@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%2010%20complete-1f6feb?style=for-the-badge" alt="Phase 10 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%2011%20complete-1f6feb?style=for-the-badge" alt="Phase 11 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />

@@ -428,6 +428,12 @@ export class TransfersService {
         include: {
           sourceLocation: { select: { id: true, name: true } },
           targetLocation: { select: { id: true, name: true } },
+          lines: {
+            include: {
+              item: { select: { name: true, code: true } },
+              unit: { select: { symbol: true } },
+            },
+          },
         },
       }),
     ]);

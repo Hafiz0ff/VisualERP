@@ -45,3 +45,9 @@ Many users may be coming from Excel-style workflows. The UI should therefore:
 ## Device Scope
 
 Desktop is the primary target for MVP. Mobile support can be added later for selected workflows such as warehouse operations and approvals.
+
+---
+
+## Phase 11 UI Rules Status
+
+Completed on 2026-06-25. Verified and formatted loading skeletons, error screens, empty state visuals, and dynamic backend value calculations across the desktop UI shell.

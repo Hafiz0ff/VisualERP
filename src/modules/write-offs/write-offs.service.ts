@@ -394,6 +394,12 @@ export class WriteOffsService {
         include: {
           location: { select: { id: true, name: true } },
           responsibleUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+          lines: {
+            include: {
+              item: { select: { name: true, code: true } },
+              unit: { select: { symbol: true } },
+            },
+          },
         },
       }),
     ]);

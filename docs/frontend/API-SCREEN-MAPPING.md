@@ -393,3 +393,9 @@ Format convention: if a screen omits `Secondary API endpoints`, `Lifecycle actio
 * **Loading state**: Skeleton grid.
 * **Error state**: Action failed alert.
 * **Notes**: User and role management remains a future API gap. Phase 11 should not render this as a connected screen until backend routes exist.
+
+---
+
+## Phase 11 Integration Status
+
+Completed on 2026-06-25. Connected all 11 active screens: Dashboard, Raw Materials, Products, Incoming Materials, Transfers, Production, Shipments, Write-offs, Workshop, Reports, and AuditLog to live backend APIs. Mismatches in flat vs. nested DTO lines are handled cleanly in the DTO mapper functions.

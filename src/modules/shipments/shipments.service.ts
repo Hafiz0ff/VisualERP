@@ -406,6 +406,12 @@ export class ShipmentsService {
         include: {
           customer: { select: { id: true, name: true } },
           sourceLocation: { select: { id: true, name: true } },
+          lines: {
+            include: {
+              item: { select: { name: true, code: true } },
+              unit: { select: { symbol: true } },
+            },
+          },
         },
       }),
     ]);

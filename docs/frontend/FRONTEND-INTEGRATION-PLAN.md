@@ -123,3 +123,9 @@ We identify the following frontend integration risks:
    - *Mitigation*: Do not invent a fake JWT. Phase 11 should use an explicit demo organization selector that sets `X-Organization-Id`, then replace it with real auth context in a later Auth phase.
 6. **Stock balance derivations**: The UI must not perform independent stock additions or subtractions in client memory.
    - *Mitigation*: Treat the backend ledger as the single source of truth and query report balances matrix directly.
+
+---
+
+## 5. Phase 11 Status (Completed)
+
+Implemented on 2026-06-25. Replaced all static client-side mocks with live fetch requests using a type-safe client, global error parser, mapping conversions, and centralized organization state.

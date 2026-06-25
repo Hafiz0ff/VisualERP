@@ -65,3 +65,9 @@ To prevent duplicate actions caused by double-clicks or unstable connections:
    - If the request fails with a network timeout (the server might have received it but failed to reply), **the client must retry using the exact same Idempotency-Key**.
    - If the request returns an explicit conflict (`IDEMPOTENCY_CONFLICT`, HTTP 409), the UI notifies the user that the action is already processing and reloads the document state.
    - If the request returns a client error (`VALIDATION_ERROR` or `INSUFFICIENT_STOCK`), the UI displays the error details and enables the user to correct input. For a subsequent retry, a **new** idempotency key is generated because the payload is different.
+
+---
+
+## Phase 11 State and Errors Status
+
+Completed on 2026-06-25. Configured loading skeletons, error screens, and empty list visual states across all pages. Direct write operations are bypass-alerted in the UI in a mock-only mode.
