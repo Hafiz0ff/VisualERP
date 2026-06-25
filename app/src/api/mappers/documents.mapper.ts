@@ -114,6 +114,7 @@ export interface MappedInventoryAudit {
   items: {
     materialId: string;
     materialName: string;
+    unitId?: string;
     batchId: string;
     batchName: string;
     expected: number;
@@ -139,11 +140,11 @@ export function mapPurchaseReceipt(doc: PurchaseReceiptDetail): MappedPurchaseRe
     comment: '',
     items: doc.lines.map((line) => ({
       materialId: line.itemId,
-      materialName: line.itemName || 'Неизвестно',
+      materialName: line.itemName || line.item?.name || 'Неизвестно',
       batchId: line.batchNumber,
       batchName: line.batchNumber,
       quantity: line.quantity,
-      unit: line.unitSymbol || 'кг',
+      unit: line.unitSymbol || line.unit?.symbol || 'кг',
       pricePerUnit: line.costPerUnit || 0,
       total: line.totalPrice || line.quantity * (line.costPerUnit || 0),
     })),
@@ -161,11 +162,11 @@ export function mapTransfer(doc: TransferDetail): MappedTransfer {
     comment: '',
     items: doc.lines.map((line) => ({
       materialId: line.itemId,
-      materialName: line.itemName || 'Неизвестно',
+      materialName: line.itemName || line.item?.name || 'Неизвестно',
       batchId: line.batchId || '',
-      batchName: line.batchNumber || '',
+      batchName: line.batchNumber || line.batch?.batchNumber || '',
       quantity: line.quantity,
-      unit: line.unitSymbol || 'кг',
+      unit: line.unitSymbol || line.unit?.symbol || 'кг',
     })),
   };
 }
@@ -215,9 +216,9 @@ export function mapShipment(doc: ShipmentDetail): MappedShipment {
     comment: '',
     items: (doc.lines || []).map((line) => ({
       productId: line.itemId,
-      productName: line.itemName || 'Неизвестно',
+      productName: line.itemName || line.item?.name || 'Неизвестно',
       quantity: line.quantity,
-      unit: line.unitSymbol || 'меш',
+      unit: line.unitSymbol || line.unit?.symbol || 'меш',
       price: line.pricePerUnit || 0,
       total: line.quantity * (line.pricePerUnit || 0),
     })),
@@ -241,11 +242,11 @@ export function mapWriteOff(doc: WriteOffDetail): MappedWriteOff {
     type: reasonMap[doc.reason] || 'other',
     targetType: 'material',
     targetId: primaryLine?.itemId || '',
-    targetName: primaryLine?.itemName || '',
-    batchId: primaryLine?.batchNumber || undefined,
-    batchName: primaryLine?.batchNumber || undefined,
+    targetName: primaryLine?.itemName || primaryLine?.item?.name || '',
+    batchId: primaryLine?.batchNumber || primaryLine?.batch?.batchNumber || undefined,
+    batchName: primaryLine?.batchNumber || primaryLine?.batch?.batchNumber || undefined,
     quantity: primaryLine?.quantity || 0,
-    unit: primaryLine?.unitSymbol || 'кг',
+    unit: primaryLine?.unitSymbol || primaryLine?.unit?.symbol || 'кг',
     reason: doc.description || '',
     responsible: 'Администратор',
     status: doc.status.toLowerCase() as MappedWriteOff['status'],
@@ -260,13 +261,14 @@ export function mapInventoryAudit(doc: InventoryAuditDetail): MappedInventoryAud
     location: doc.location?.name || 'Склад',
     items: (doc.lines || []).map((line) => ({
       materialId: line.itemId,
-      materialName: line.itemName || 'Неизвестно',
+      materialName: line.itemName || line.item?.name || 'Неизвестно',
+      unitId: line.unitId,
       batchId: line.batchId || '',
-      batchName: line.batchNumber || '',
+      batchName: line.batchNumber || line.batch?.batchNumber || '',
       expected: line.expectedQuantity,
       actual: line.actualQuantity,
       discrepancy: line.discrepancyQuantity,
-      unit: line.unitSymbol || 'кг',
+      unit: line.unitSymbol || line.unit?.symbol || 'кг',
     })),
   };
 }

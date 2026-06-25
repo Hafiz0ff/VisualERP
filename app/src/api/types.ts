@@ -99,6 +99,19 @@ export interface StockMovement {
   lines: StockMovementLine[];
 }
 
+interface DocumentLineItemRef {
+  name: string;
+  code: string | null;
+}
+
+interface DocumentLineUnitRef {
+  symbol: string;
+}
+
+interface DocumentLineBatchRef {
+  batchNumber: string;
+}
+
 export interface PurchaseReceiptListItem {
   id: string;
   receiptNumber: string;
@@ -118,10 +131,13 @@ export interface PurchaseReceiptListItem {
 export interface PurchaseReceiptLine {
   id: string;
   itemId: string;
-  itemName: string;
-  itemCode: string | null;
+  itemName?: string;
+  itemCode?: string | null;
+  item?: DocumentLineItemRef;
   quantity: number;
-  unitSymbol: string;
+  unitId?: string;
+  unitSymbol?: string;
+  unit?: DocumentLineUnitRef;
   batchNumber: string;
   expirationDate: string | null;
   costPerUnit: number;
@@ -153,11 +169,15 @@ export interface TransferListItem {
 export interface TransferLine {
   id: string;
   itemId: string;
-  itemName: string;
+  itemName?: string;
+  item?: DocumentLineItemRef;
   quantity: number;
-  unitSymbol: string;
+  unitId?: string;
+  unitSymbol?: string;
+  unit?: DocumentLineUnitRef;
   batchId: string | null;
-  batchNumber: string | null;
+  batchNumber?: string | null;
+  batch?: DocumentLineBatchRef | null;
 }
 
 export interface TransferDetail extends TransferListItem {
@@ -241,10 +261,14 @@ export interface ShipmentDetail extends ShipmentListItem {
   lines: {
     id: string;
     itemId: string;
-    itemName: string;
+    itemName?: string;
+    item?: DocumentLineItemRef;
     quantity: number;
-    unitSymbol: string;
-    batchNumber: string | null;
+    unitId?: string;
+    unitSymbol?: string;
+    unit?: DocumentLineUnitRef;
+    batchNumber?: string | null;
+    batch?: DocumentLineBatchRef | null;
     pricePerUnit: number | null;
   }[];
 }
@@ -269,10 +293,14 @@ export interface WriteOffDetail extends WriteOffListItem {
   lines: {
     id: string;
     itemId: string;
-    itemName: string;
+    itemName?: string;
+    item?: DocumentLineItemRef;
     quantity: number;
-    unitSymbol: string;
-    batchNumber: string | null;
+    unitId?: string;
+    unitSymbol?: string;
+    unit?: DocumentLineUnitRef;
+    batchNumber?: string | null;
+    batch?: DocumentLineBatchRef | null;
   }[];
 }
 
@@ -295,14 +323,18 @@ export interface InventoryAuditDetail extends InventoryAuditListItem {
   lines: {
     id: string;
     itemId: string;
-    itemName: string;
-    itemCode: string | null;
+    itemName?: string;
+    itemCode?: string | null;
+    item?: DocumentLineItemRef;
     batchId: string | null;
-    batchNumber: string | null;
+    batchNumber?: string | null;
+    batch?: DocumentLineBatchRef | null;
     expectedQuantity: number;
     actualQuantity: number;
     discrepancyQuantity: number;
-    unitSymbol: string;
+    unitId: string;
+    unitSymbol?: string;
+    unit?: DocumentLineUnitRef;
   }[];
 }
 
@@ -362,4 +394,16 @@ export interface DashboardResponse {
     entityId: string;
     summary: string;
   }[];
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  code: string;
 }

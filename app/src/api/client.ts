@@ -60,7 +60,7 @@ export async function apiRequest<T>(
   method: HttpMethod,
   path: string,
   options?: {
-    body?: BodyInit | Record<string, unknown> | unknown[];
+    body?: unknown;
     params?: QueryParams;
     headers?: Record<string, string>;
     signal?: AbortSignal;
@@ -78,7 +78,9 @@ export async function apiRequest<T>(
   const response = await fetch(url, {
     method,
     headers,
-    body: (options?.body && !(options.body instanceof FormData) ? JSON.stringify(options.body) : options?.body) as BodyInit | null | undefined,
+    body: options?.body && !(options.body instanceof FormData)
+      ? JSON.stringify(options.body)
+      : (options?.body as BodyInit | null | undefined),
     signal: options?.signal,
   });
 

@@ -65,23 +65,39 @@ export class ProductionOrdersService {
         throw new ValidationError(`Workshop location must have type WORKSHOP, but got ${location.type}`);
       }
 
-      // Validate BOM if provided
+      // Validate BOM if provided, or auto-resolve active BOM for target item
       let bomLines: BOMLine[] = [];
-      if (data.bomId) {
+      let resolvedBomId = data.bomId || null;
+      if (resolvedBomId) {
         const bom = await tx.bOM.findFirst({
-          where: { id: data.bomId, organizationId },
+          where: { id: resolvedBomId, organizationId },
           include: { lines: true },
         });
         if (!bom) {
-          throw new NotFoundError(`BOM with ID ${data.bomId} not found`);
+          throw new NotFoundError(`BOM with ID ${resolvedBomId} not found`);
         }
         if (!bom.isActive) {
-          throw new ValidationError(`BOM with ID ${data.bomId} is inactive`);
+          throw new ValidationError(`BOM with ID ${resolvedBomId} is inactive`);
         }
         if (bom.outputItemId !== data.targetItemId) {
           throw new ConflictError(`BOM output item ${bom.outputItemId} does not match production target item ${data.targetItemId}`);
         }
         bomLines = bom.lines;
+      } else {
+        const activeBoms = await tx.bOM.findMany({
+          where: { outputItemId: data.targetItemId, isActive: true, organizationId },
+          include: { lines: true },
+        });
+        if (activeBoms.length > 1) {
+          throw new ConflictError(
+            `Multiple active BOMs found for output item ${data.targetItemId}. Deactivate duplicates or pass bomId explicitly.`
+          );
+        }
+        const activeBom = activeBoms[0];
+        if (activeBom) {
+          resolvedBomId = activeBom.id;
+          bomLines = activeBom.lines;
+        }
       }
 
       // Create production order
@@ -92,7 +108,7 @@ export class ProductionOrdersService {
           targetItemId: data.targetItemId,
           plannedQuantity: data.plannedQuantity,
           targetUnitId: data.targetUnitId,
-          bomId: data.bomId || null,
+          bomId: resolvedBomId,
           workshopLocationId: data.workshopLocationId,
           status: ProductionStatus.PLANNED,
           scheduledDate: new Date(data.scheduledDate),

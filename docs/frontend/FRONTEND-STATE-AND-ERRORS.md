@@ -68,6 +68,7 @@ To prevent duplicate actions caused by double-clicks or unstable connections:
 
 ---
 
-## Phase 11 State and Errors Status
+## Phase 11 & 12 State and Errors Status
 
-Completed on 2026-06-25. Configured loading skeletons, error screens, and empty list visual states across all pages. Direct write operations are bypass-alerted in the UI in a mock-only mode.
+- **Phase 11 (Completed)**: Configured loading skeletons, error screens, and empty list visual states across all pages. Direct write operations are bypass-alerted in the UI in a mock-only mode.
+- **Phase 12 (Completed)**: Connected creation forms, dropdown option selectors, double-submit blocking, confirmation overlays, and centralized idempotency keys for all document lifecycle actions. Created a new Inventory Audits page.

@@ -48,6 +48,7 @@ Desktop is the primary target for MVP. Mobile support can be added later for sel
 
 ---
 
-## Phase 11 UI Rules Status
+## Phase 11 & 12 UI Rules Status
 
-Completed on 2026-06-25. Verified and formatted loading skeletons, error screens, empty state visuals, and dynamic backend value calculations across the desktop UI shell.
+- **Phase 11 (Completed)**: Verified and formatted loading skeletons, error screens, empty state visuals, and dynamic backend value calculations across the desktop UI shell.
+- **Phase 12 (Completed)**: Connected creation forms, dropdown option loaders, double-submit prevention, confirmation overlays, and centralized idempotency keys for all document workflows. Created a new Inventory Audits page.

@@ -341,12 +341,14 @@ interface BOMResponseDTO {
 #### 5.5.4 Production Orders
 
 - `GET /api/production-orders` — List production orders.
-- `POST /api/production-orders` — Create planned order (calculates input line requirements).
+- `POST /api/production-orders` — Create planned order. If `bomId` is omitted, the backend may attach the single active BOM for the same organization and target output item.
 - `GET /api/production-orders/:id` — Get order details.
 - `PATCH /api/production-orders/:id` — Edit planned order.
-- `POST /api/production-orders/:id/start` — Start order (status -> `IN_PROGRESS`).
+- `POST /api/production-orders/:id/start` — Start order (status -> `IN_PROGRESS`). (Requires `Idempotency-Key`)
 - `POST /api/production-orders/:id/complete` — Complete order, posting materials consumed and outputs produced. (Requires `Idempotency-Key`)
 - `POST /api/production-orders/:id/cancel` — Cancel order. (Requires `Idempotency-Key`)
+
+Auto BOM resolution is constrained to `organizationId`, `targetItemId`, and `isActive = true`. If more than one active BOM matches because of inconsistent data, the API must return `409 Conflict` instead of selecting one arbitrarily. Production can still be created without a BOM; completion then requires explicit consumption lines.
 
 ##### DTO Mappings:
 ```typescript

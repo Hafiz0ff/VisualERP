@@ -126,6 +126,7 @@ We identify the following frontend integration risks:
 
 ---
 
-## 5. Phase 11 Status (Completed)
+## 5. Phase 11 & 12 Status (Completed)
 
-Implemented on 2026-06-25. Replaced all static client-side mocks with live fetch requests using a type-safe client, global error parser, mapping conversions, and centralized organization state.
+- **Phase 11 (Read-Only)**: Implemented on 2026-06-25. Replaced all static client-side mocks with live fetch requests using a type-safe client, global error parser, mapping conversions, and centralized organization state.
+- **Phase 12 (Mutations & Lifecycle)**: Implemented on 2026-06-25. Connected all creation forms, dropdown loaders, and document lifecycle actions (post, cancel, start, complete, ship, count, approve) with confirmation overlays and centralized idempotency keys. Implemented the new Inventory Audits page.

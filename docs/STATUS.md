@@ -14,6 +14,7 @@
 - **Phase 9 (Dashboard and MVP Demo Flow)**: Completed on 2026-06-25. Implemented real-time dashboard endpoint (`GET /api/dashboard`) returning stock summaries (dynamically calculated from movements), production/shipment/write-off monthly counts, pending document actions, and recent audit events. Created a comprehensive end-to-end MVP Demo Flow guide using `curl`.
 - **Phase 10 (Frontend Integration Planning)**: Completed on 2026-06-25. Prepared a detailed frontend integration plan mapping all 16 prototype screens to backend APIs, DTO contracts, required permissions, state/error lifecycle rules, and integration risks/mitigations. No code or archive changes were introduced.
 - **Phase 11 (Frontend API Client and Read-Only Integration)**: Completed on 2026-06-25. Implemented shared fetch-based API client, envelop parser, toast error handling, active organization dropdown switcher, mapper conversions, and connected all list/detail views (Dashboard, Raw Materials, Products, Receipts, Transfers, Production, Shipments, Write-offs, Workshop, Reports, AuditLog) as read-only.
+- **Phase 12 (Frontend Mutations and Lifecycle Actions)**: Completed on 2026-06-25. Connected all creation forms, dynamic dropdown loaders (suppliers, customers, warehouses, workshops), and lifecycle mutation actions (post, cancel, start, complete, ship, count, approve) with confirmation overlays and centralized idempotency keys. Created a new Inventory Audits page.
 - **Backend/API/Frontend**: Backend services, schema, dictionary CRUDs, warehouse documents, report queries, real-time dashboard endpoints, and frontend client integration are complete and compile cleanly.
 
 ## Current Product Direction
@@ -24,8 +25,8 @@
 
 ## Immediate Next Step
 
-Next recommended task: **Phase 12 — Frontend Mutations and Lifecycle Actions**
+Next recommended task: **Phase 13 — Testing and Hardening**
 
-Phase 12 will cover:
-- Connecting creation/modification forms in the frontend to backend POST/PATCH API endpoints.
-- Integrating document lifecycle actions (post, cancel, ship, count, approve) with required Idempotency-Key headers.
+Phase 13 will cover:
+- Automated end-to-end testing of write operations and error handling.
+- Boundary value validation and system resilience testing.

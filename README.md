@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%2011%20complete-1f6feb?style=for-the-badge" alt="Phase 11 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%2012%20complete-1f6feb?style=for-the-badge" alt="Phase 12 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -153,15 +153,16 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 10 |
+| Product documentation | Complete through Phase 12 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Dashboard and MVP Demo Flow complete, Frontend integration blueprint ready |
+| Backend implementation | Transactional warehouse, production, shipment, inventory audit, reports, and dashboard APIs complete |
 | Initial Prisma schema | Complete |
+| Frontend application | Read-only API integration and core mutation/lifecycle flows connected |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 11 - Frontend API Client and Read-Only Integration |
+| Next recommended phase | Phase 13 - Testing and Hardening |
 
 ## Planned Tech Direction
 
@@ -336,11 +337,30 @@ Phase 10 established:
 - conceptual DTO data contracts (`docs/frontend/FRONTEND-DATA-CONTRACTS.md`) for all dashboard and document list/detail views;
 - frontend state/error guidelines (`docs/frontend/FRONTEND-STATE-AND-ERRORS.md`) and role-based permissions (`docs/frontend/FRONTEND-PERMISSIONS.md`).
 
+### Phase 11
+
+Phase 11 established:
+
+- shared frontend API client with standard envelope parsing, organization scoping, and toast-based error handling;
+- active organization switching and live read-only data loading for dashboard, master data, warehouse documents, production, shipments, reports, and audit log views;
+- mapper layer translating backend DTOs into the preserved prototype screen models without changing the archived visual direction.
+
+### Phase 12
+
+Phase 12 established:
+
+- create forms and lifecycle actions for receipts, transfers, write-offs, production orders, shipments, and inventory audits;
+- centralized `Idempotency-Key` handling for state-changing document actions with confirmation dialogs;
+- live dropdowns for suppliers, customers, items, units through item metadata, warehouses, and workshops;
+- inventory audit page covering draft creation, physical count entry, approval, cancellation, and stock balance refresh;
+- backend auto-resolution of a single active BOM for a production target item when `bomId` is omitted, with explicit conflict handling for inconsistent multiple-active-BOM data.
+
 ## Next Step
 
-**Phase 11 - Frontend API Client and Read-Only Integration**
+**Phase 13 - Testing and Hardening**
 
 The next phase should define:
 
-- Implementing the unified Axios/fetch API client, global error handler, and react hooks in the frontend project;
-- Connecting read-only lists and dashboard cards to the real backend APIs using organizational context.
+- automated end-to-end checks for create/post/cancel/ship/count/approve flows;
+- negative-path validation tests for permissions, organization scoping, idempotency conflicts, stock shortages, and invalid lifecycle transitions;
+- focused frontend hardening for mutation error states and retry behavior.

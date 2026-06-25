@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   LayoutDashboard, Warehouse, Factory, ArrowRightLeft,
   FlaskConical, PackageCheck, BarChart3,
-  Truck, FileMinus, ScrollText, LogIn,
+  Truck, FileMinus, ScrollText, LogIn, ClipboardCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Dashboard from './pages/Dashboard'
@@ -17,6 +17,7 @@ import Shipments from './pages/Shipments'
 import WriteOffs from './pages/WriteOffs'
 import Reports from './pages/Reports'
 import AuditLog from './pages/AuditLog'
+import InventoryAudits from './pages/InventoryAudits'
 
 const navItems = [
   { key: 'dashboard', label: 'Главная', icon: LayoutDashboard },
@@ -29,6 +30,7 @@ const navItems = [
   { key: 'products', label: 'Готовая продукция', icon: PackageCheck },
   { key: 'shipments', label: 'Отгрузки', icon: Truck },
   { key: 'writeoffs', label: 'Списания', icon: FileMinus },
+  { key: 'audits', label: 'Инвентаризация', icon: ClipboardCheck },
   { key: 'reports', label: 'Отчеты', icon: BarChart3 },
   { key: 'auditlog', label: 'Журнал операций', icon: ScrollText },
 ]
@@ -50,6 +52,7 @@ export default function App() {
       case 'writeoffs': return <WriteOffs />
       case 'reports': return <Reports />
       case 'auditlog': return <AuditLog />
+      case 'audits': return <InventoryAudits />
       default: return <Dashboard />
     }
   }

@@ -16,7 +16,7 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 9 - Dashboard and MVP Demo Flow
 - [x] Phase 10 - Frontend Integration Planning
 - [x] Phase 11 - Frontend API Client and Read-Only Integration
-- [ ] Phase 12 - Frontend Mutations and Lifecycle Actions
+- [x] Phase 12 - Frontend Mutations and Lifecycle Actions
 - [ ] Phase 13 - Testing and Hardening
 - [ ] Phase 14 - Deployment
 - [ ] Phase 15 - Industry Profiles
@@ -192,6 +192,20 @@ Scope:
 - Replaced local mocks with live API data on all 11 core screens: Dashboard, Raw Materials, Products, Incoming Materials, Transfers, Production, Shipments, Write-offs, Workshop, Reports, and AuditLog.
 - Handled UI states (loading shimmers, empty lists, error messages, and unreachable/denied warnings).
 - Kept write operations mock-based in preparation for Phase 12.
+
+---
+
+### Phase 12 - Frontend Mutations and Lifecycle Actions
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented centralized idempotency key generator (`ve_<timestamp>_<random>`).
+- Built type-safe API mutation services for purchase receipts, transfers, write-offs, production orders, shipments, and inventory audits using the shared client.
+- Integrated creation forms and dynamic option loading (for suppliers, customers, and warehouses/workshops) on all document workflows.
+- Registered a brand new "Inventory Audits" page in the sidebar and layout structure.
+- Wired all lifecycle state transitions (post, cancel, start, complete, ship, count, approve) using confirmation modal dialog overlays.
+- Tested end-to-end integration and resolved type safety across the application.
 
 ---
 
