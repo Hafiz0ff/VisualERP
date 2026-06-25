@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Warehouse, Factory, ArrowRightLeft,
   FlaskConical, PackageCheck, BarChart3,
@@ -18,6 +18,9 @@ import WriteOffs from './pages/WriteOffs'
 import Reports from './pages/Reports'
 import AuditLog from './pages/AuditLog'
 import InventoryAudits from './pages/InventoryAudits'
+import { apiRequest } from './api/client'
+import { getActiveOrganizationId, setActiveOrganizationId } from './api/organization'
+import { type Organization } from './api/types'
 
 const navItems = [
   { key: 'dashboard', label: 'Главная', icon: LayoutDashboard },
@@ -37,6 +40,39 @@ const navItems = [
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
+  const [organizationReady, setOrganizationReady] = useState(false)
+
+  useEffect(() => {
+    let active = true
+
+    async function initializeOrganization() {
+      try {
+        const res = await apiRequest<{ data: Organization[] }>('GET', '/api/organizations')
+        if (!active) return
+
+        const organizations = res.data || []
+        const currentOrgId = getActiveOrganizationId()
+        const currentOrgExists = organizations.some((org) => org.id === currentOrgId)
+        const resolvedOrgId = currentOrgExists ? currentOrgId : organizations[0]?.id
+
+        if (resolvedOrgId && resolvedOrgId !== currentOrgId) {
+          setActiveOrganizationId(resolvedOrgId)
+        }
+      } catch (err) {
+        console.error('Failed to initialize organization context:', err)
+      } finally {
+        if (active) {
+          setOrganizationReady(true)
+        }
+      }
+    }
+
+    initializeOrganization()
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const renderPage = () => {
     switch (page) {
@@ -55,6 +91,16 @@ export default function App() {
       case 'audits': return <InventoryAudits />
       default: return <Dashboard />
     }
+  }
+
+  if (!organizationReady) {
+    return (
+      <div className="min-h-screen bg-[#F6F5F2] flex items-center justify-center">
+        <div className="rounded-lg border border-[#D4CFC8] bg-white px-6 py-4 text-[13px] text-[#5E5E5E] shadow-sm">
+          Загружаем демо-организацию...
+        </div>
+      </div>
+    )
   }
 
   return (

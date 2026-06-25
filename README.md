@@ -141,7 +141,7 @@ npm install
 npx prisma db push
 npx prisma generate
 
-# Заполнение БД демо-данными (производственный рецепт, сырье, склады)
+# Заполнение БД реалистичными демо-данными
 npm run db:seed
 
 # Запуск backend в dev-режиме
@@ -160,7 +160,12 @@ npm run dev
 
 ---
 
-### 2. Запуск E2E авто-теста бизнес-процесса
+### 2. Реалистичные демо-данные
+Seed заполняет не только справочники, но и живой демонстрационный сценарий: закупки сырья, перемещения в цех, производственные заказы в разных статусах, выпуск готовой продукции, отгрузки, списания, инвентаризации, складские остатки и журнал действий. Повторный запуск seed очищает только операционные документы демо-организации и создает сценарий заново, поэтому демо можно безопасно переинициализировать.
+
+---
+
+### 3. Запуск E2E авто-теста бизнес-процесса
 В системе присутствует сквозной автоматический скрипт тестирования [verify_e2e.ts](verify_e2e.ts). Он полностью имитирует действия пользователей: делает закупки сырья, перемещения в цех, запускает рецептурное производство, отгружает товар и проводит аудит склада, сверяя балансы в БД на каждом шаге.
 
 Для запуска теста (при работающем бэкенде):
@@ -170,7 +175,7 @@ npx ts-node verify_e2e.ts
 
 ---
 
-### 3. Запуск через Docker Compose (Production-ready)
+### 4. Запуск через Docker Compose (Production-ready)
 Для имитации полноценного боевого сервера (или развёртывания на VPS):
 ```bash
 # Копирование переменных среды для продакшена
@@ -180,6 +185,21 @@ cp .env.production.example .env
 docker compose up --build -d
 ```
 После этого система будет запущена на едином **порту 80** (вход через Nginx с проксированием к API). Вы сможете зайти на `http://localhost`.
+
+Для локального демо-показа удобнее использовать отдельный порт `8080`:
+```bash
+FRONTEND_PORT=8080 docker compose --env-file .env.production.example up --build -d
+docker compose --env-file .env.production.example exec backend npx prisma db push
+docker compose --env-file .env.production.example exec backend npm run db:seed:compiled
+```
+
+### 5. Быстрая временная ссылка через Cloudflare Tunnel
+Для показа MVP внешним пользователям без VPS можно открыть локальный Docker-стек через временную ссылку Cloudflare:
+```bash
+cloudflared tunnel --no-autoupdate --url http://localhost:8080
+```
+
+Cloudflare выдаст временный адрес вида `https://...trycloudflare.com`. Ссылка работает, пока запущены Docker-контейнеры и процесс `cloudflared`.
 
 ---
 
@@ -299,7 +319,7 @@ npm install
 npx prisma db push
 npx prisma generate
 
-# Populate database with sample construction mix BOM and items
+# Populate database with realistic demo data
 npm run db:seed
 
 # Launch backend dev server
@@ -318,7 +338,12 @@ The React frontend will be accessible at `http://localhost:5173`.
 
 ---
 
-### 2. Running the E2E Validation Script
+### 2. Realistic Demo Data
+The seed script now creates a full demo story, not only dictionaries: raw material receipts, warehouse-to-workshop transfers, production orders in multiple states, finished goods output, shipments, write-offs, inventory audits, stock balances, and audit log events. Re-running the seed clears only operational demo documents for the demo organization and recreates the scenario from scratch.
+
+---
+
+### 3. Running the E2E Validation Script
 We ship a programmatic E2E script [verify_e2e.ts](verify_e2e.ts) in the workspace root. It runs a full factory cycle (materials receipt, transfer, recipe completion with waste, shipment, inventory audit adjustments) and validates data accuracy:
 ```bash
 npx ts-node verify_e2e.ts
@@ -326,7 +351,7 @@ npx ts-node verify_e2e.ts
 
 ---
 
-### 3. Production Deployment with Docker Compose
+### 4. Production Deployment with Docker Compose
 To run the full stack as a unified containerized system:
 ```bash
 # Setup production environment template
@@ -336,6 +361,21 @@ cp .env.production.example .env
 docker compose up --build -d
 ```
 The application will serve static assets and proxy API endpoints on host **port 80**. Access it at `http://localhost`.
+
+For a local demo session, use port `8080`:
+```bash
+FRONTEND_PORT=8080 docker compose --env-file .env.production.example up --build -d
+docker compose --env-file .env.production.example exec backend npx prisma db push
+docker compose --env-file .env.production.example exec backend npm run db:seed:compiled
+```
+
+### 5. Quick Temporary Link with Cloudflare Tunnel
+To share the MVP without touching a VPS, expose the local Docker stack through a temporary Cloudflare URL:
+```bash
+cloudflared tunnel --no-autoupdate --url http://localhost:8080
+```
+
+Cloudflare will print a temporary `https://...trycloudflare.com` address. The link works while Docker and `cloudflared` are running.
 
 ---
 

@@ -1,6 +1,444 @@
-import { PrismaClient, ItemType, LocationType, BatchStatus, ModuleKey } from '@prisma/client';
+import { PrismaClient, ItemType, LocationType, ModuleKey, WriteOffReason } from '@prisma/client';
+import { InventoryAuditsService } from '../src/modules/inventory-audits/inventory-audits.service';
+import { ProductionOrdersService } from '../src/modules/production-orders/production-orders.service';
+import { PurchaseReceiptsService } from '../src/modules/purchase-receipts/purchase-receipts.service';
+import { ShipmentsService } from '../src/modules/shipments/shipments.service';
+import { TransfersService } from '../src/modules/transfers/transfers.service';
+import { WriteOffsService } from '../src/modules/write-offs/write-offs.service';
 
 const prisma = new PrismaClient();
+
+type IdMap = Record<string, string>;
+
+function dateFromToday(dayOffset: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + dayOffset);
+  return date.toISOString();
+}
+
+function requireMapId(map: IdMap, key: string): string {
+  const value = map[key];
+  if (!value) {
+    throw new Error(`Seed reference "${key}" was not created.`);
+  }
+  return value;
+}
+
+async function resetDemoOperationalData(organizationId: string) {
+  console.log('Resetting demo operational data...');
+
+  await prisma.auditLog.deleteMany({ where: { organizationId } });
+  await prisma.idempotencyKey.deleteMany({ where: { organizationId } });
+  await prisma.stockMovementLine.deleteMany({ where: { stockMovement: { organizationId } } });
+  await prisma.stockMovement.deleteMany({ where: { organizationId } });
+
+  await prisma.inventoryAuditLine.deleteMany({ where: { inventoryAudit: { organizationId } } });
+  await prisma.inventoryAudit.deleteMany({ where: { organizationId } });
+
+  await prisma.writeOffLine.deleteMany({ where: { writeOff: { organizationId } } });
+  await prisma.writeOff.deleteMany({ where: { organizationId } });
+
+  await prisma.shipmentLine.deleteMany({ where: { shipment: { organizationId } } });
+  await prisma.shipment.deleteMany({ where: { organizationId } });
+
+  await prisma.finishedGoodsOutput.deleteMany({ where: { organizationId } });
+  await prisma.productionConsumption.deleteMany({ where: { organizationId } });
+  await prisma.productionOrderLine.deleteMany({ where: { productionOrder: { organizationId } } });
+  await prisma.productionOrder.deleteMany({ where: { organizationId } });
+
+  await prisma.transferLine.deleteMany({ where: { transfer: { organizationId } } });
+  await prisma.transfer.deleteMany({ where: { organizationId } });
+
+  await prisma.purchaseReceiptLine.deleteMany({ where: { purchaseReceipt: { organizationId } } });
+  await prisma.purchaseReceipt.deleteMany({ where: { organizationId } });
+
+  await prisma.stockBatch.deleteMany({ where: { organizationId } });
+  await prisma.documentSequence.deleteMany({ where: { organizationId } });
+}
+
+async function findBatch(organizationId: string, itemId: string, batchNumber: string) {
+  const batch = await prisma.stockBatch.findFirst({
+    where: { organizationId, itemId, batchNumber },
+  });
+  if (!batch) {
+    throw new Error(`Expected batch ${batchNumber} was not created.`);
+  }
+  return batch;
+}
+
+async function seedDemoOperationalScenario(input: {
+  organizationId: string;
+  userId: string;
+  unitsMap: IdMap;
+  itemsMap: IdMap;
+  locationsMap: IdMap;
+  suppliersMap: IdMap;
+  customersMap: IdMap;
+}) {
+  const { organizationId, userId, unitsMap, itemsMap, locationsMap, suppliersMap, customersMap } = input;
+
+  console.log('Seeding realistic demo workflow...');
+
+  await resetDemoOperationalData(organizationId);
+
+  const kg = requireMapId(unitsMap, 'kg');
+  const pcs = requireMapId(unitsMap, 'pcs');
+  const bag = requireMapId(unitsMap, 'bag');
+
+  const whMain = requireMapId(locationsMap, 'WH-MAIN');
+  const whFg = requireMapId(locationsMap, 'WH-FG');
+  const whQa = requireMapId(locationsMap, 'WH-QA');
+  const workshop = requireMapId(locationsMap, 'WS-1');
+  const packing = requireMapId(locationsMap, 'WS-PACK');
+
+  const cement = requireMapId(itemsMap, 'MAT-CEM-500');
+  const gypsum = requireMapId(itemsMap, 'MAT-GYP-BLD');
+  const sand = requireMapId(itemsMap, 'MAT-SND-QRT');
+  const limestone = requireMapId(itemsMap, 'MAT-LIM-FLR');
+  const polymer = requireMapId(itemsMap, 'MAT-POL-ADD');
+  const bag25 = requireMapId(itemsMap, 'PKG-BAG-25');
+  const bag30 = requireMapId(itemsMap, 'PKG-BAG-30');
+  const film = requireMapId(itemsMap, 'PKG-FILM');
+  const adhesive = requireMapId(itemsMap, 'FG-ADH-25');
+  const plaster = requireMapId(itemsMap, 'FG-PLST-30');
+
+  const receipt = await PurchaseReceiptsService.create(organizationId, userId, {
+    date: dateFromToday(-14),
+    supplierId: requireMapId(suppliersMap, 'SUP-GLOBAL'),
+    targetLocationId: whMain,
+    lines: [
+      {
+        itemId: cement,
+        quantity: 6000,
+        unitId: kg,
+        batchNumber: 'DEMO-CEM-2026-06-A',
+        expirationDate: dateFromToday(240),
+        costPerUnit: 0.92,
+      },
+      {
+        itemId: gypsum,
+        quantity: 3000,
+        unitId: kg,
+        batchNumber: 'DEMO-GYP-2026-06-A',
+        expirationDate: dateFromToday(180),
+        costPerUnit: 0.64,
+      },
+      {
+        itemId: polymer,
+        quantity: 350,
+        unitId: kg,
+        batchNumber: 'DEMO-POL-2026-06-A',
+        expirationDate: dateFromToday(365),
+        costPerUnit: 18.5,
+      },
+    ],
+  });
+  await PurchaseReceiptsService.post(organizationId, receipt.id, userId);
+
+  const sandReceipt = await PurchaseReceiptsService.create(organizationId, userId, {
+    date: dateFromToday(-12),
+    supplierId: requireMapId(suppliersMap, 'SUP-QUARTZ'),
+    targetLocationId: whMain,
+    lines: [
+      {
+        itemId: sand,
+        quantity: 9000,
+        unitId: kg,
+        batchNumber: 'DEMO-SND-2026-06-A',
+        expirationDate: dateFromToday(300),
+        costPerUnit: 0.31,
+      },
+      {
+        itemId: limestone,
+        quantity: 1500,
+        unitId: kg,
+        batchNumber: 'DEMO-LIM-2026-06-A',
+        expirationDate: dateFromToday(300),
+        costPerUnit: 0.27,
+      },
+    ],
+  });
+  await PurchaseReceiptsService.post(organizationId, sandReceipt.id, userId);
+
+  const packagingReceipt = await PurchaseReceiptsService.create(organizationId, userId, {
+    date: dateFromToday(-11),
+    supplierId: requireMapId(suppliersMap, 'SUP-PACK'),
+    targetLocationId: whMain,
+    lines: [
+      {
+        itemId: bag25,
+        quantity: 3000,
+        unitId: pcs,
+        batchNumber: 'DEMO-BAG25-2026-06-A',
+        expirationDate: dateFromToday(540),
+        costPerUnit: 1.75,
+      },
+      {
+        itemId: bag30,
+        quantity: 1500,
+        unitId: pcs,
+        batchNumber: 'DEMO-BAG30-2026-06-A',
+        expirationDate: dateFromToday(540),
+        costPerUnit: 1.95,
+      },
+      {
+        itemId: film,
+        quantity: 200,
+        unitId: pcs,
+        batchNumber: 'DEMO-FILM-2026-06-A',
+        expirationDate: dateFromToday(540),
+        costPerUnit: 22,
+      },
+    ],
+  });
+  await PurchaseReceiptsService.post(organizationId, packagingReceipt.id, userId);
+
+  const draftReceipt = await PurchaseReceiptsService.create(organizationId, userId, {
+    date: dateFromToday(2),
+    supplierId: requireMapId(suppliersMap, 'SUP-GLOBAL'),
+    targetLocationId: whQa,
+    lines: [
+      {
+        itemId: cement,
+        quantity: 1200,
+        unitId: kg,
+        batchNumber: 'DEMO-CEM-PENDING-QA',
+        expirationDate: dateFromToday(260),
+        costPerUnit: 0.95,
+      },
+    ],
+  });
+
+  const cancelledReceipt = await PurchaseReceiptsService.create(organizationId, userId, {
+    date: dateFromToday(-10),
+    supplierId: requireMapId(suppliersMap, 'SUP-GLOBAL'),
+    targetLocationId: whMain,
+    lines: [
+      {
+        itemId: cement,
+        quantity: 100,
+        unitId: kg,
+        batchNumber: 'DEMO-CEM-CANCELLED',
+        expirationDate: dateFromToday(240),
+        costPerUnit: 0.9,
+      },
+    ],
+  });
+  await PurchaseReceiptsService.post(organizationId, cancelledReceipt.id, userId);
+  await PurchaseReceiptsService.cancel(organizationId, cancelledReceipt.id, userId);
+  console.log(`Created draft receipt ${draftReceipt.receiptNumber} for incoming QA stock.`);
+
+  const cementBatch = await findBatch(organizationId, cement, 'DEMO-CEM-2026-06-A');
+  const gypsumBatch = await findBatch(organizationId, gypsum, 'DEMO-GYP-2026-06-A');
+  const sandBatch = await findBatch(organizationId, sand, 'DEMO-SND-2026-06-A');
+  const limestoneBatch = await findBatch(organizationId, limestone, 'DEMO-LIM-2026-06-A');
+  const polymerBatch = await findBatch(organizationId, polymer, 'DEMO-POL-2026-06-A');
+  const bag25Batch = await findBatch(organizationId, bag25, 'DEMO-BAG25-2026-06-A');
+  const bag30Batch = await findBatch(organizationId, bag30, 'DEMO-BAG30-2026-06-A');
+  const filmBatch = await findBatch(organizationId, film, 'DEMO-FILM-2026-06-A');
+
+  const productionTransfer = await TransfersService.create(organizationId, userId, {
+    date: dateFromToday(-9),
+    sourceLocationId: whMain,
+    targetLocationId: workshop,
+    lines: [
+      { itemId: cement, quantity: 2500, unitId: kg, batchId: cementBatch.id },
+      { itemId: sand, quantity: 4000, unitId: kg, batchId: sandBatch.id },
+      { itemId: gypsum, quantity: 1600, unitId: kg, batchId: gypsumBatch.id },
+      { itemId: limestone, quantity: 700, unitId: kg, batchId: limestoneBatch.id },
+      { itemId: polymer, quantity: 120, unitId: kg, batchId: polymerBatch.id },
+      { itemId: bag25, quantity: 600, unitId: pcs, batchId: bag25Batch.id },
+      { itemId: bag30, quantity: 500, unitId: pcs, batchId: bag30Batch.id },
+    ],
+  });
+  await TransfersService.post(organizationId, productionTransfer.id, userId);
+
+  const draftTransfer = await TransfersService.create(organizationId, userId, {
+    date: dateFromToday(1),
+    sourceLocationId: whMain,
+    targetLocationId: packing,
+    lines: [
+      { itemId: film, quantity: 40, unitId: pcs, batchId: filmBatch.id },
+    ],
+  });
+
+  const cancelledTransfer = await TransfersService.create(organizationId, userId, {
+    date: dateFromToday(-8),
+    sourceLocationId: whMain,
+    targetLocationId: packing,
+    lines: [
+      { itemId: film, quantity: 12, unitId: pcs, batchId: filmBatch.id },
+    ],
+  });
+  await TransfersService.post(organizationId, cancelledTransfer.id, userId);
+  await TransfersService.cancel(organizationId, cancelledTransfer.id, userId);
+  console.log(`Created draft transfer ${draftTransfer.transferNumber} for packaging replenishment.`);
+
+  const adhesiveOrder = await ProductionOrdersService.create(organizationId, userId, {
+    targetItemId: adhesive,
+    plannedQuantity: 120,
+    targetUnitId: bag,
+    bomId: null,
+    workshopLocationId: workshop,
+    scheduledDate: dateFromToday(-7),
+  });
+  await ProductionOrdersService.start(organizationId, adhesiveOrder.id, userId);
+  await ProductionOrdersService.complete(organizationId, adhesiveOrder.id, userId, {
+    actualQuantity: 120,
+    outputBatchNumber: 'DEMO-FG-ADH-2026-06-A',
+    outputExpirationDate: dateFromToday(365),
+    productionLocationId: whFg,
+  });
+
+  const plasterOrder = await ProductionOrdersService.create(organizationId, userId, {
+    targetItemId: plaster,
+    plannedQuantity: 50,
+    targetUnitId: bag,
+    bomId: null,
+    workshopLocationId: workshop,
+    scheduledDate: dateFromToday(-6),
+  });
+  await ProductionOrdersService.complete(organizationId, plasterOrder.id, userId, {
+    actualQuantity: 50,
+    outputBatchNumber: 'DEMO-FG-PLST-2026-06-A',
+    outputExpirationDate: dateFromToday(300),
+    productionLocationId: whFg,
+  });
+
+  const inProgressOrder = await ProductionOrdersService.create(organizationId, userId, {
+    targetItemId: plaster,
+    plannedQuantity: 80,
+    targetUnitId: bag,
+    bomId: null,
+    workshopLocationId: workshop,
+    scheduledDate: dateFromToday(0),
+  });
+  await ProductionOrdersService.start(organizationId, inProgressOrder.id, userId);
+
+  await ProductionOrdersService.create(organizationId, userId, {
+    targetItemId: adhesive,
+    plannedQuantity: 180,
+    targetUnitId: bag,
+    bomId: null,
+    workshopLocationId: workshop,
+    scheduledDate: dateFromToday(3),
+  });
+
+  const cancelledOrder = await ProductionOrdersService.create(organizationId, userId, {
+    targetItemId: adhesive,
+    plannedQuantity: 40,
+    targetUnitId: bag,
+    bomId: null,
+    workshopLocationId: workshop,
+    scheduledDate: dateFromToday(-2),
+  });
+  await ProductionOrdersService.cancel(organizationId, cancelledOrder.id, userId);
+
+  const adhesiveBatch = await findBatch(organizationId, adhesive, 'DEMO-FG-ADH-2026-06-A');
+  const plasterBatch = await findBatch(organizationId, plaster, 'DEMO-FG-PLST-2026-06-A');
+
+  const shippedAdhesive = await ShipmentsService.create(organizationId, userId, {
+    date: dateFromToday(-4),
+    customerId: requireMapId(customersMap, 'CUST-BUILD'),
+    sourceLocationId: whFg,
+    lines: [
+      { itemId: adhesive, quantity: 60, unitId: bag, pricePerUnit: 46, batchId: adhesiveBatch.id },
+    ],
+  });
+  await ShipmentsService.ship(organizationId, shippedAdhesive.id, userId);
+
+  const shippedPlaster = await ShipmentsService.create(organizationId, userId, {
+    date: dateFromToday(-3),
+    customerId: requireMapId(customersMap, 'CUST-PAMIR'),
+    sourceLocationId: whFg,
+    lines: [
+      { itemId: plaster, quantity: 20, unitId: bag, pricePerUnit: 39, batchId: plasterBatch.id },
+    ],
+  });
+  await ShipmentsService.ship(organizationId, shippedPlaster.id, userId);
+
+  await ShipmentsService.create(organizationId, userId, {
+    date: dateFromToday(1),
+    customerId: requireMapId(customersMap, 'CUST-DUSH-STROY'),
+    sourceLocationId: whFg,
+    lines: [
+      { itemId: adhesive, quantity: 30, unitId: bag, pricePerUnit: 45, batchId: adhesiveBatch.id },
+    ],
+  });
+
+  const cancelledShipment = await ShipmentsService.create(organizationId, userId, {
+    date: dateFromToday(-2),
+    customerId: requireMapId(customersMap, 'CUST-DUSH-STROY'),
+    sourceLocationId: whFg,
+    lines: [
+      { itemId: adhesive, quantity: 5, unitId: bag, pricePerUnit: 45, batchId: adhesiveBatch.id },
+    ],
+  });
+  await ShipmentsService.ship(organizationId, cancelledShipment.id, userId);
+  await ShipmentsService.cancel(organizationId, cancelledShipment.id, userId);
+
+  const postedWriteOff = await WriteOffsService.create(organizationId, userId, {
+    date: dateFromToday(-2),
+    locationId: whFg,
+    reason: WriteOffReason.DEFECT,
+    description: 'Повреждение упаковки при перекладке готовой продукции.',
+    lines: [
+      { itemId: adhesive, quantity: 8, unitId: bag, batchId: adhesiveBatch.id },
+    ],
+  });
+  await WriteOffsService.post(organizationId, postedWriteOff.id, userId);
+
+  await WriteOffsService.create(organizationId, userId, {
+    date: dateFromToday(0),
+    locationId: whFg,
+    reason: WriteOffReason.SAMPLE,
+    description: 'Образцы для отдела продаж, ожидают подтверждения.',
+    lines: [
+      { itemId: plaster, quantity: 2, unitId: bag, batchId: plasterBatch.id },
+    ],
+  });
+
+  const cancelledWriteOff = await WriteOffsService.create(organizationId, userId, {
+    date: dateFromToday(-1),
+    locationId: whFg,
+    reason: WriteOffReason.OTHER,
+    description: 'Ошибочно созданный акт списания.',
+    lines: [
+      { itemId: adhesive, quantity: 1, unitId: bag, batchId: adhesiveBatch.id },
+    ],
+  });
+  await WriteOffsService.post(organizationId, cancelledWriteOff.id, userId);
+  await WriteOffsService.cancel(organizationId, cancelledWriteOff.id, userId);
+
+  const approvedAudit = await InventoryAuditsService.create(organizationId, userId, {
+    auditDate: dateFromToday(-1),
+    locationId: whFg,
+  });
+  await InventoryAuditsService.count(organizationId, approvedAudit.id, userId, {
+    lines: [
+      { itemId: adhesive, unitId: bag, batchId: adhesiveBatch.id, actualQuantity: 50 },
+      { itemId: plaster, unitId: bag, batchId: plasterBatch.id, actualQuantity: 30 },
+    ],
+  });
+  await InventoryAuditsService.approve(organizationId, approvedAudit.id, userId);
+
+  const countedAudit = await InventoryAuditsService.create(organizationId, userId, {
+    auditDate: dateFromToday(0),
+    locationId: whMain,
+  });
+  await InventoryAuditsService.count(organizationId, countedAudit.id, userId, {
+    lines: [
+      { itemId: film, unitId: pcs, batchId: filmBatch.id, actualQuantity: 200 },
+    ],
+  });
+
+  await InventoryAuditsService.create(organizationId, userId, {
+    auditDate: dateFromToday(2),
+    locationId: workshop,
+  });
+
+  console.log('Realistic demo workflow seeded successfully.');
+}
 
 async function main() {
   console.log('--- Starting Database Seeding ---');
@@ -286,11 +724,11 @@ async function main() {
   // 8. Create Measurement Units
   console.log('Seeding Units...');
   const unitList = [
-    { symbol: 'kg', name: 'Kilogram', isBaseUnit: true },
-    { symbol: 't', name: 'Ton', isBaseUnit: false },
-    { symbol: 'pcs', name: 'Piece', isBaseUnit: true },
-    { symbol: 'bag', name: 'Bag', isBaseUnit: true }, // base unit for adhesive/plaster packaging in manufacturing
-    { symbol: 'pallet', name: 'Pallet', isBaseUnit: false },
+    { symbol: 'kg', name: 'Килограмм', isBaseUnit: true },
+    { symbol: 't', name: 'Тонна', isBaseUnit: false },
+    { symbol: 'pcs', name: 'Штука', isBaseUnit: true },
+    { symbol: 'bag', name: 'Мешок', isBaseUnit: true },
+    { symbol: 'pallet', name: 'Поддон', isBaseUnit: false },
   ];
 
   const unitsMap: { [key: string]: string } = {};
@@ -355,8 +793,11 @@ async function main() {
   // 9. Create Stock Locations
   console.log('Seeding Stock Locations...');
   const locationsList = [
-    { name: 'Main Warehouse', code: 'WH-MAIN', type: LocationType.WAREHOUSE },
-    { name: 'Workshop 1', code: 'WS-1', type: LocationType.WORKSHOP },
+    { name: 'Центральный склад сырья', code: 'WH-MAIN', type: LocationType.WAREHOUSE },
+    { name: 'Склад готовой продукции', code: 'WH-FG', type: LocationType.WAREHOUSE },
+    { name: 'Зона карантина и контроля', code: 'WH-QA', type: LocationType.WAREHOUSE },
+    { name: 'Смесительный цех N1', code: 'WS-1', type: LocationType.WORKSHOP },
+    { name: 'Участок фасовки', code: 'WS-PACK', type: LocationType.WORKSHOP },
   ];
 
   const locationsMap: { [key: string]: string } = {};
@@ -385,60 +826,146 @@ async function main() {
   }
 
   // Seeding Sample Partners
-  console.log('Seeding Sample Supplier...');
-  const sampleSupplier = await prisma.supplier.upsert({
-    where: {
-      organizationId_code: {
-        organizationId: demoOrg.id,
-        code: 'SUP-GLOBAL',
-      },
-    },
-    update: {
-      name: 'Global Raw Materials LLC',
-      contactInfo: 'sales@globalraw.com',
-      isActive: true,
-    },
-    create: {
-      organizationId: demoOrg.id,
-      name: 'Global Raw Materials LLC',
+  console.log('Seeding Sample Suppliers...');
+  const supplierList = [
+    {
       code: 'SUP-GLOBAL',
-      contactInfo: 'sales@globalraw.com',
-      isActive: true,
+      name: 'Global Raw Materials LLC',
+      contactInfo: 'sales@globalraw.example, +992 900 10 20 30',
+      taxId: 'SUP-100245',
+      notes: 'Цемент, гипс и минеральные добавки. Срок поставки 2-3 дня.',
     },
-  });
+    {
+      code: 'SUP-QUARTZ',
+      name: 'Кварц Минерал',
+      contactInfo: 'zakaz@quartz.example, +992 900 44 55 66',
+      taxId: 'SUP-100312',
+      notes: 'Промытый кварцевый песок фракции 0.1-0.6 мм.',
+    },
+    {
+      code: 'SUP-PACK',
+      name: 'PackLine Asia',
+      contactInfo: 'pack@packline.example, +992 900 77 88 99',
+      taxId: 'SUP-100401',
+      notes: 'Бумажные мешки, поддоны и упаковочная пленка.',
+    },
+  ];
 
-  console.log('Seeding Sample Customer...');
-  const sampleCustomer = await prisma.customer.upsert({
-    where: {
-      organizationId_code: {
-        organizationId: demoOrg.id,
-        code: 'CUST-BUILD',
+  const suppliersMap: IdMap = {};
+  for (const supplierItem of supplierList) {
+    const supplier = await prisma.supplier.upsert({
+      where: {
+        organizationId_code: {
+          organizationId: demoOrg.id,
+          code: supplierItem.code,
+        },
       },
-    },
-    update: {
-      name: 'BuildTech Solutions',
-      contactInfo: 'info@buildtech.com',
-      isActive: true,
-    },
-    create: {
-      organizationId: demoOrg.id,
-      name: 'BuildTech Solutions',
+      update: {
+        name: supplierItem.name,
+        contactInfo: supplierItem.contactInfo,
+        taxId: supplierItem.taxId,
+        notes: supplierItem.notes,
+        isActive: true,
+      },
+      create: {
+        organizationId: demoOrg.id,
+        ...supplierItem,
+        isActive: true,
+      },
+    });
+    suppliersMap[supplierItem.code] = supplier.id;
+  }
+
+  console.log('Seeding Sample Customers...');
+  const customerList = [
+    {
       code: 'CUST-BUILD',
-      contactInfo: 'info@buildtech.com',
-      isActive: true,
+      name: 'BuildTech Solutions',
+      contactInfo: 'info@buildtech.example, +992 901 11 22 33',
+      taxId: 'CUST-210011',
+      notes: 'Регулярный покупатель клея для плитки.',
     },
-  });
+    {
+      code: 'CUST-DUSH-STROY',
+      name: 'Душанбе Строй Маркет',
+      contactInfo: 'sales@dsm.example, +992 901 44 55 66',
+      taxId: 'CUST-210078',
+      notes: 'Розничная сеть строительных материалов.',
+    },
+    {
+      code: 'CUST-PAMIR',
+      name: 'Pamir Construction Group',
+      contactInfo: 'supply@pamirbuild.example, +992 901 77 88 99',
+      taxId: 'CUST-210115',
+      notes: 'Покупает готовую штукатурку под объектные поставки.',
+    },
+  ];
+
+  const customersMap: IdMap = {};
+  for (const customerItem of customerList) {
+    const customer = await prisma.customer.upsert({
+      where: {
+        organizationId_code: {
+          organizationId: demoOrg.id,
+          code: customerItem.code,
+        },
+      },
+      update: {
+        name: customerItem.name,
+        contactInfo: customerItem.contactInfo,
+        taxId: customerItem.taxId,
+        notes: customerItem.notes,
+        isActive: true,
+      },
+      create: {
+        organizationId: demoOrg.id,
+        ...customerItem,
+        isActive: true,
+      },
+    });
+    customersMap[customerItem.code] = customer.id;
+  }
+
+  console.log('Seeding Item Categories...');
+  const categoryList = [
+    { code: 'CAT-MATERIALS', name: 'Сырье', description: 'Минеральные и химические компоненты производства' },
+    { code: 'CAT-PACKAGING', name: 'Упаковка', description: 'Мешки, пленка и вспомогательная тара' },
+    { code: 'CAT-FINISHED', name: 'Готовая продукция', description: 'Фасованные строительные смеси' },
+    { code: 'CAT-CONSUMABLES', name: 'Расходники', description: 'Материалы для обслуживания цеха' },
+  ];
+
+  const categoriesMap: IdMap = {};
+  for (const categoryItem of categoryList) {
+    const category = await prisma.itemCategory.upsert({
+      where: {
+        organizationId_name: {
+          organizationId: demoOrg.id,
+          name: categoryItem.name,
+        },
+      },
+      update: { description: categoryItem.description },
+      create: {
+        organizationId: demoOrg.id,
+        name: categoryItem.name,
+        description: categoryItem.description,
+      },
+    });
+    categoriesMap[categoryItem.code] = category.id;
+  }
 
   // 10. Create Sample Items
   console.log('Seeding Sample Items...');
   const itemsList = [
-    { name: 'Цемент ПЦ-500', code: 'MAT-CEM-500', unitSymbol: 'kg', type: ItemType.MATERIAL },
-    { name: 'Гипс строительный', code: 'MAT-GYP-BLD', unitSymbol: 'kg', type: ItemType.MATERIAL },
-    { name: 'Песок кварцевый очищенный', code: 'MAT-SND-QRT', unitSymbol: 'kg', type: ItemType.MATERIAL },
-    { name: 'Полимерная добавка (пластификатор)', code: 'MAT-POL-ADD', unitSymbol: 'kg', type: ItemType.MATERIAL },
-    { name: 'Бумажный мешок 25кг', code: 'PKG-BAG-25', unitSymbol: 'pcs', type: ItemType.PACKAGING },
-    { name: 'Клей плиточный базовый 25кг', code: 'FG-ADH-25', unitSymbol: 'bag', type: ItemType.FINISHED_PRODUCT },
-    { name: 'Штукатурка гипсовая 30кг', code: 'FG-PLST-30', unitSymbol: 'bag', type: ItemType.FINISHED_PRODUCT },
+    { name: 'Цемент ПЦ-500 Д0', code: 'MAT-CEM-500', unitSymbol: 'kg', type: ItemType.MATERIAL, categoryCode: 'CAT-MATERIALS' },
+    { name: 'Гипс строительный Г-5', code: 'MAT-GYP-BLD', unitSymbol: 'kg', type: ItemType.MATERIAL, categoryCode: 'CAT-MATERIALS' },
+    { name: 'Песок кварцевый очищенный', code: 'MAT-SND-QRT', unitSymbol: 'kg', type: ItemType.MATERIAL, categoryCode: 'CAT-MATERIALS' },
+    { name: 'Известняковый наполнитель', code: 'MAT-LIM-FLR', unitSymbol: 'kg', type: ItemType.MATERIAL, categoryCode: 'CAT-MATERIALS' },
+    { name: 'Полимерная добавка', code: 'MAT-POL-ADD', unitSymbol: 'kg', type: ItemType.MATERIAL, categoryCode: 'CAT-MATERIALS' },
+    { name: 'Бумажный мешок 25 кг', code: 'PKG-BAG-25', unitSymbol: 'pcs', type: ItemType.PACKAGING, categoryCode: 'CAT-PACKAGING' },
+    { name: 'Бумажный мешок 30 кг', code: 'PKG-BAG-30', unitSymbol: 'pcs', type: ItemType.PACKAGING, categoryCode: 'CAT-PACKAGING' },
+    { name: 'Стрейч-пленка для поддонов', code: 'PKG-FILM', unitSymbol: 'pcs', type: ItemType.PACKAGING, categoryCode: 'CAT-PACKAGING' },
+    { name: 'Клей плиточный базовый 25 кг', code: 'FG-ADH-25', unitSymbol: 'bag', type: ItemType.FINISHED_PRODUCT, categoryCode: 'CAT-FINISHED' },
+    { name: 'Штукатурка гипсовая 30 кг', code: 'FG-PLST-30', unitSymbol: 'bag', type: ItemType.FINISHED_PRODUCT, categoryCode: 'CAT-FINISHED' },
   ];
 
   const itemsMap: { [key: string]: string } = {};
@@ -454,6 +981,7 @@ async function main() {
         name: it.name,
         unitId: unitsMap[it.unitSymbol],
         itemType: it.type,
+        categoryId: categoriesMap[it.categoryCode],
         isActive: true,
       },
       create: {
@@ -461,6 +989,7 @@ async function main() {
         name: it.name,
         code: it.code,
         unitId: unitsMap[it.unitSymbol],
+        categoryId: categoriesMap[it.categoryCode],
         itemType: it.type,
         isActive: true,
       },
@@ -516,6 +1045,64 @@ async function main() {
       },
     });
   }
+
+  const bomGypsumPlaster = await prisma.bOM.upsert({
+    where: {
+      organizationId_outputItemId_version: {
+        organizationId: demoOrg.id,
+        outputItemId: itemsMap['FG-PLST-30'],
+        version: '1.0.0',
+      },
+    },
+    update: {
+      name: 'Гипсовая штукатурка машинного нанесения',
+      isActive: true,
+      createdByUserId: demoUser.id,
+    },
+    create: {
+      organizationId: demoOrg.id,
+      outputItemId: itemsMap['FG-PLST-30'],
+      name: 'Гипсовая штукатурка машинного нанесения',
+      version: '1.0.0',
+      isActive: true,
+      createdByUserId: demoUser.id,
+    },
+  });
+
+  await prisma.bOMLine.deleteMany({
+    where: { bomId: bomGypsumPlaster.id },
+  });
+
+  const plasterBomLines = [
+    { inputItemCode: 'MAT-GYP-BLD', quantity: 22.0, unitSymbol: 'kg', wastePercent: 0.5 },
+    { inputItemCode: 'MAT-SND-QRT', quantity: 3.0, unitSymbol: 'kg', wastePercent: 1.0 },
+    { inputItemCode: 'MAT-LIM-FLR', quantity: 4.0, unitSymbol: 'kg', wastePercent: 0.0 },
+    { inputItemCode: 'MAT-POL-ADD', quantity: 0.2, unitSymbol: 'kg', wastePercent: 0.0 },
+    { inputItemCode: 'PKG-BAG-30', quantity: 1.0, unitSymbol: 'pcs', wastePercent: 2.0 },
+  ];
+
+  for (const line of plasterBomLines) {
+    await prisma.bOMLine.create({
+      data: {
+        bomId: bomGypsumPlaster.id,
+        inputItemId: itemsMap[line.inputItemCode],
+        quantity: line.quantity,
+        unitId: unitsMap[line.unitSymbol],
+        wastePercent: line.wastePercent,
+        notes: 'Норма расхода на 1 мешок готовой штукатурки (30 кг)',
+      },
+    });
+  }
+
+  await seedDemoOperationalScenario({
+    organizationId: demoOrg.id,
+    userId: demoUser.id,
+    unitsMap,
+    itemsMap,
+    locationsMap,
+    suppliersMap,
+    customersMap,
+  });
 
   console.log('--- Database Seeding Completed Successfully ---');
 }

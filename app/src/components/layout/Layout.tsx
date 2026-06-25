@@ -20,6 +20,15 @@ export function Layout({ children, title }: LayoutProps) {
         const res = await apiRequest<{ data: Organization[] }>('GET', '/api/organizations')
         if (active && res && res.data) {
           setOrgs(res.data)
+          const currentOrgId = getActiveOrganizationId()
+          const currentOrgExists = res.data.some((org) => org.id === currentOrgId)
+          const resolvedOrgId = currentOrgExists ? currentOrgId : res.data[0]?.id
+          if (resolvedOrgId) {
+            setActiveOrgId(resolvedOrgId)
+            if (resolvedOrgId !== currentOrgId) {
+              setActiveOrganizationId(resolvedOrgId)
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to load organizations in topbar:', err)

@@ -69,7 +69,10 @@ export async function apiRequest<T>(
   const url = buildUrl(path, options?.params);
 
   const headers = new Headers(options?.headers);
-  headers.set('X-Organization-Id', getActiveOrganizationId());
+  const organizationId = getActiveOrganizationId();
+  if (organizationId) {
+    headers.set('X-Organization-Id', organizationId);
+  }
 
   if (options?.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
