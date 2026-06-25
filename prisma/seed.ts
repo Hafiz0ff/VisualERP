@@ -384,6 +384,51 @@ async function main() {
     locationsMap[loc.code] = location.id;
   }
 
+  // Seeding Sample Partners
+  console.log('Seeding Sample Supplier...');
+  const sampleSupplier = await prisma.supplier.upsert({
+    where: {
+      organizationId_code: {
+        organizationId: demoOrg.id,
+        code: 'SUP-GLOBAL',
+      },
+    },
+    update: {
+      name: 'Global Raw Materials LLC',
+      contactInfo: 'sales@globalraw.com',
+      isActive: true,
+    },
+    create: {
+      organizationId: demoOrg.id,
+      name: 'Global Raw Materials LLC',
+      code: 'SUP-GLOBAL',
+      contactInfo: 'sales@globalraw.com',
+      isActive: true,
+    },
+  });
+
+  console.log('Seeding Sample Customer...');
+  const sampleCustomer = await prisma.customer.upsert({
+    where: {
+      organizationId_code: {
+        organizationId: demoOrg.id,
+        code: 'CUST-BUILD',
+      },
+    },
+    update: {
+      name: 'BuildTech Solutions',
+      contactInfo: 'info@buildtech.com',
+      isActive: true,
+    },
+    create: {
+      organizationId: demoOrg.id,
+      name: 'BuildTech Solutions',
+      code: 'CUST-BUILD',
+      contactInfo: 'info@buildtech.com',
+      isActive: true,
+    },
+  });
+
   // 10. Create Sample Items
   console.log('Seeding Sample Items...');
   const itemsList = [

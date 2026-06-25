@@ -21,6 +21,7 @@ import { productionOrdersRoutes } from './modules/production-orders/production-o
 import { shipmentsRoutes } from './modules/shipments/shipments.routes';
 import { inventoryAuditsRoutes } from './modules/inventory-audits/inventory-audits.routes';
 import { stockReportsRoutes } from './modules/stock-reports/stock-reports.routes';
+import { dashboardRoutes } from './modules/dashboard/dashboard.routes';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -89,6 +90,7 @@ export function createServer(): FastifyInstance {
   app.register(shipmentsRoutes, { prefix: '/api/shipments' });
   app.register(inventoryAuditsRoutes, { prefix: '/api/inventory-audits' });
   app.register(stockReportsRoutes, { prefix: '/api/stock' });
+  app.register(dashboardRoutes, { prefix: '/api/dashboard' });
 
   return app;
 }

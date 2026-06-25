@@ -504,62 +504,94 @@ interface CountInventoryAuditDTO {
 
 - `GET /api/dashboard` — Fetch home analytics cards widget payload.
 
+`lowStockItems` is intentionally returned as an empty array until minimum stock thresholds are modeled explicitly. The dashboard must not calculate low stock from arbitrary constants.
+
 #### Response DTO:
 ```json
 {
   "data": {
     "stockSummary": {
-      "totalItems": 150,
-      "totalCategories": 5,
-      "totalWarehouseLocations": 2,
-      "totalWorkshopLocations": 1
-    },
-    "lowStockItems": [
-      {
-        "itemId": "e5b8d231-8930-4e3a-bf41-4560d2bdf7cc",
-        "itemName": "Paper Bag 25kg",
-        "sku": "PKG-BAG-25",
-        "available": 20.0,
-        "unitSymbol": "pcs",
-        "minimumAlert": 100.0
+      "totalStockItems": 5,
+      "totalStockLocations": 2,
+      "totalStockBatches": 5,
+      "totalQtyByType": {
+        "MATERIAL": 1000.0,
+        "PACKAGING": 90.0,
+        "FINISHED_PRODUCT": 41.0
       }
-    ],
+    },
+    "lowStockItems": [],
     "productionSummary": {
-      "plannedCount": 5,
-      "inProgressCount": 2,
-      "completedTodayCount": 1
+      "byStatus": {
+        "PLANNED": 0,
+        "IN_PROGRESS": 0,
+        "COMPLETED": 1,
+        "CANCELLED": 0
+      },
+      "completedCurrentMonthCount": 1,
+      "latestCompleted": [
+        {
+          "id": "prod-uuid",
+          "orderNumber": "PRD-00001",
+          "targetItemId": "item-uuid",
+          "targetItemName": "Tile Adhesive 25kg",
+          "targetItemCode": "FG-ADH-25",
+          "actualQuantity": 50,
+          "completedAt": "2026-06-25T14:30:00.000Z"
+        }
+      ]
     },
     "shipmentSummary": {
-      "shippedTodayCount": 3,
-      "pendingShipmentCount": 2
+      "byStatus": {
+        "DRAFT": 0,
+        "SHIPPED": 1,
+        "CANCELLED": 0
+      },
+      "shippedCurrentMonthCount": 1,
+      "latestShipped": [
+        {
+          "id": "ship-uuid",
+          "shipmentNumber": "SHP-00001",
+          "customerId": "cust-uuid",
+          "customerName": "BuildTech Solutions",
+          "shippedAt": "2026-06-25T15:10:00.000Z"
+        }
+      ]
     },
     "writeOffSummary": {
-      "totalDefectQuantityToday": 25.0,
-      "totalTechnologicalLossToday": 120.0
+      "byStatus": {
+        "DRAFT": 0,
+        "POSTED": 0,
+        "CANCELLED": 0
+      },
+      "postedCurrentMonthCount": 0,
+      "byReason": {}
     },
-    "pendingDocuments": [
-      {
-        "documentType": "PurchaseReceipt",
-        "documentId": "a988d231-8930-4e3a-bf41-4560d2bdf7dd",
-        "documentNumber": "REC-2026-001",
-        "status": "DRAFT",
-        "createdAt": "2026-06-25T01:00:00.000Z"
-      }
-    ],
+    "pendingDocuments": {
+      "draftPurchaseReceiptsCount": 0,
+      "draftTransfersCount": 0,
+      "plannedOrInProgressProductionOrdersCount": 0,
+      "draftShipmentsCount": 0,
+      "draftWriteOffsCount": 0,
+      "countedInventoryAuditsCount": 0
+    },
     "recentAuditEvents": [
       {
-        "userId": "d77b8d23-8930-4e3a-bf41-4560d2bdf7dd",
-        "userName": "Дмитрий Директор",
-        "timestamp": "2026-06-25T03:50:00.000Z",
-        "action": "DOCUMENT_POST",
-        "entityType": "PurchaseReceipt",
-        "entityId": "a988d231-8930-4e3a-bf41-4560d2bdf7dd"
+        "id": "log-uuid",
+        "timestamp": "2026-06-25T16:15:00.000Z",
+        "userId": "user-uuid",
+        "userEmail": "demo@visualerp.com",
+        "userFullName": "Дмитрий Директор",
+        "action": "APPROVE",
+        "entityType": "InventoryAudit",
+        "entityId": "audit-uuid",
+        "summary": "APPROVE performed on InventoryAudit (audit-uuid)"
       }
     ]
   },
   "meta": {
-    "requestId": "req_500",
-    "timestamp": "2026-06-25T03:52:16.000Z"
+    "requestId": "req_...",
+    "timestamp": "2026-06-25T16:30:00.000Z"
   }
 }
 ```

@@ -13,8 +13,8 @@ Phase-based delivery checklist for the project roadmap.
 - [x] Phase 6 - Business Document Workflows
 - [x] Phase 7 - Production and Shipment Workflows
 - [x] Phase 8 - Inventory Audits and Stock Reports
-- [ ] Phase 9 - Frontend Integration
-- [ ] Phase 10 - Reports and Dashboard
+- [x] Phase 9 - Dashboard and MVP Demo Flow
+- [ ] Phase 10 - Frontend Integration Planning
 - [ ] Phase 11 - Testing and Hardening
 - [ ] Phase 12 - Deployment
 - [ ] Phase 13 - Industry Profiles
@@ -152,6 +152,17 @@ Scope:
 - Implemented discrepancy-based stock ledger adjustments using `INVENTORY_ADJUSTMENT` movement types.
 - Implemented stock balance reports (matrix, per-item, per-location), historical movement logs, active batch list, and a safe low-stock limitation response until minimum stock thresholds are modeled.
 - Enforced permission scopes and idempotency checks.
+
+---
+
+### Phase 9 - Dashboard and MVP Demo Flow
+
+Status: completed on 2026-06-25.
+
+Scope:
+- Implemented real-time dashboard endpoint `GET /api/dashboard` (under `dashboard:read` permission) aggregating stock, production, shipment, write-off metrics, and recent audit events.
+- Added Supplier and Customer sample entities seeding in `prisma/seed.ts`.
+- Created end-to-end MVP Demo Flow guide `docs/demo/MVP-DEMO-FLOW.md` detailing backend operations with copy-pasteable `curl` calls.
 
 ---
 

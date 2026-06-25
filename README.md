@@ -3,7 +3,7 @@
   <p><strong>Lightweight, visual, modular ERP for small manufacturing businesses.</strong></p>
   <p>Documentation-first foundation for a modern alternative to Excel-heavy and old 1C-style workflows.</p>
   <p>
-    <img src="https://img.shields.io/badge/status-phase%208%20complete-1f6feb?style=for-the-badge" alt="Phase 8 Complete" />
+    <img src="https://img.shields.io/badge/status-phase%209%20complete-1f6feb?style=for-the-badge" alt="Phase 9 Complete" />
     <img src="https://img.shields.io/badge/architecture-modular%20monolith-0a7f5a?style=for-the-badge" alt="Modular Monolith" />
     <img src="https://img.shields.io/badge/focus-small%20manufacturing-c26d00?style=for-the-badge" alt="Small Manufacturing" />
     <img src="https://img.shields.io/badge/language-Russian%20docs%20%2B%20English%20tech-5b4b8a?style=for-the-badge" alt="Russian Docs and English Tech" />
@@ -153,15 +153,15 @@ Purchase receipt
 | Area | Status |
 | --- | --- |
 | Repository foundation | Complete |
-| Product documentation | Complete for Phase 8 |
+| Product documentation | Complete for Phase 9 |
 | Architecture direction | Defined and aligned with the domain model |
 | Domain model | Complete |
 | Database schema foundation | Complete |
 | API contract | Complete |
-| Backend implementation | Inventory Audits and Stock Reports complete |
+| Backend implementation | Dashboard and MVP Demo Flow complete |
 | Initial Prisma schema | Complete |
 | Frontend prototype archive | Preserved |
-| Next recommended phase | Phase 9 - Frontend Integration |
+| Next recommended phase | Phase 10 - Frontend Integration Planning |
 
 ## Planned Tech Direction
 
@@ -319,11 +319,19 @@ Phase 8 established:
 - historical movement logs with filtering, active batch registers, and a safe documented low-stock limitation until minimum stock thresholds are modeled;
 - permission scopes and idempotency hooks.
 
+### Phase 9
+
+Phase 9 established:
+
+- real-time dashboard endpoint (`GET /api/dashboard`) returning stock summaries (dynamically aggregated from movements), production/shipment/write-off monthly counts, pending document actions, and recent audit events;
+- database seeding improvements to include partners (Supplier and Customer) for end-to-end flows;
+- comprehensive end-to-end MVP Demo Flow guide (`docs/demo/MVP-DEMO-FLOW.md`) describing a verifiable full stock and production cycle with copy-pasteable `curl` commands.
+
 ## Next Step
 
-**Phase 9 - Frontend Integration**
+**Phase 10 - Frontend Integration Planning**
 
 The next phase should define:
 
-- Connecting the frontend prototype or creating the React application using the modular API;
-- Integrating authentication, organization selectors, and document dashboards.
+- Planning the integration of the React frontend application with the completed backend API;
+- Mapping out authentication, tenant organization selectors, and document state workflow pages in the UI.
