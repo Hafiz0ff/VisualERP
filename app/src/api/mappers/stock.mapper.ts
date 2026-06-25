@@ -1,4 +1,5 @@
 import type { StockBatch } from '../types';
+import { formatUnit } from '@/lib/number-format';
 
 export interface MappedBatch {
   id: string;
@@ -40,7 +41,7 @@ export function mapStockBatches(batches: StockBatch[]): MappedBatch[] {
       materialName: b.item?.name || 'Сырье',
       supplier: b.supplier?.name || 'Без поставщика',
       quantity: initialQuantity,
-      unit: b.unit?.symbol || b.item?.unit?.symbol || 'кг',
+      unit: formatUnit(b.unit?.symbol || b.item?.unit?.symbol || 'кг'),
       pricePerUnit,
       totalCost: initialQuantity * pricePerUnit,
       arrivalDate,

@@ -387,7 +387,7 @@ export default function Production() {
         <div className="bg-white border border-[#D4CFC8] p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Заказ: {detailOrder.id}</span>
+              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Заказ: {detailOrder.number}</span>
               <span className="text-[18px] font-semibold text-[#2B2B2B]">{detailOrder.productName}</span>
               <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${detailOrder.status === 'completed' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : detailOrder.status === 'in_progress' ? 'bg-[#2A5C8D]/15 text-[#2A5C8D]' : detailOrder.status === 'planned' ? 'bg-[#9E9E9E]/15 text-[#9E9E9E]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>
                 {detailOrder.status === 'completed' ? 'Выполнено' : detailOrder.status === 'in_progress' ? 'В работе' : detailOrder.status === 'planned' ? 'План' : 'Отменён'}
@@ -418,9 +418,9 @@ export default function Production() {
                   </table></div>
               )}
               <div className="flex gap-2">
-                {detailOrder.status === 'planned' && <button onClick={() => handleActionClick('start', detailOrder.id, detailOrder.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#2A5C8D] rounded hover:bg-[#1A4C7D]">В работу</button>}
+                {detailOrder.status === 'planned' && <button onClick={() => handleActionClick('start', detailOrder.id, detailOrder.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#2A5C8D] rounded hover:bg-[#1A4C7D]">В работу</button>}
                 {detailOrder.status === 'in_progress' && <button onClick={() => openCompleteModal(orderDetailRes!)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">Завершить и выпустить</button>}
-                {(detailOrder.status === 'planned' || detailOrder.status === 'in_progress') && <button onClick={() => handleActionClick('cancel', detailOrder.id, detailOrder.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить</button>}
+                {(detailOrder.status === 'planned' || detailOrder.status === 'in_progress') && <button onClick={() => handleActionClick('cancel', detailOrder.id, detailOrder.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить</button>}
               </div>
             </>
           )}
@@ -437,14 +437,14 @@ export default function Production() {
           </tr></thead>
             <tbody className="divide-y divide-[#F6F5F2]">{productionOrders.slice().sort((a, b) => sOrder[a.status as keyof typeof sOrder] - sOrder[b.status as keyof typeof sOrder] || b.id.localeCompare(a.id)).map((o) => (
               <tr key={o.id} className={`h-12 hover:bg-[#EFEBE6] cursor-pointer ${detailId === o.id ? 'bg-[#F6F5F2]' : ''}`} onClick={() => setDetailId(detailId === o.id ? null : o.id)}>
-                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{o.id}</td><td className="px-4 text-[12px]">{o.date}</td>
+                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{o.number}</td><td className="px-4 text-[12px]">{o.date}</td>
                 <td className="px-4 text-[13px] font-medium">{o.productName}{o.startDate && <span className="block text-[10px] text-[#9E9E9E]">{o.startDate}{o.endDate ? ` — ${o.endDate}` : ''}</span>}</td>
                 <td className="px-4 text-[13px] text-right font-mono">{o.plannedQuantity}</td>
                 <td className="px-4 text-[13px] text-right font-mono">{o.actualQuantity || '—'}</td>
                 <td className="px-4 text-[12px] text-[#5E5E5E]">{o.responsible}</td>
                 <td className="px-4 text-center"><span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${o.status === 'completed' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : o.status === 'in_progress' ? 'bg-[#2A5C8D]/15 text-[#2A5C8D]' : o.status === 'planned' ? 'bg-[#9E9E9E]/15 text-[#9E9E9E]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>{o.status === 'completed' ? 'Выполнено' : o.status === 'in_progress' ? 'В работе' : o.status === 'planned' ? 'План' : 'Отменён'}</span></td>
                 <td className="px-4 text-center"><div className="flex items-center justify-center gap-2">
-                  {o.status === 'planned' && <button onClick={(e) => { e.stopPropagation(); handleActionClick('start', o.id, o.id.substring(0, 8)) }} className="text-[11px] text-[#2A5C8D] font-medium">В работу</button>}
+                  {o.status === 'planned' && <button onClick={(e) => { e.stopPropagation(); handleActionClick('start', o.id, o.number) }} className="text-[11px] text-[#2A5C8D] font-medium">В работу</button>}
                   {o.status === 'in_progress' && <button onClick={(e) => { e.stopPropagation(); const fullDoc = (prodOrdersRes?.data || []).find((po) => po.id === o.id); if (fullDoc) openCompleteModal(fullDoc) }} className="text-[11px] text-[#5A8A6E] font-medium">Завершить</button>}
                 </div></td>
               </tr>

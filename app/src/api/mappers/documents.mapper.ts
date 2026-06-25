@@ -6,9 +6,11 @@ import type {
   TransferDetail,
   WriteOffDetail,
 } from '../types';
+import { formatUnit, toFiniteNumber } from '@/lib/number-format';
 
 export interface MappedPurchaseReceipt {
   id: string;
+  number: string;
   date: string;
   supplier: string;
   warehouse: string;
@@ -29,6 +31,7 @@ export interface MappedPurchaseReceipt {
 
 export interface MappedTransfer {
   id: string;
+  number: string;
   date: string;
   fromLocation: string;
   toLocation: string;
@@ -47,6 +50,7 @@ export interface MappedTransfer {
 
 export interface MappedProductionOrder {
   id: string;
+  number: string;
   date: string;
   productId: string;
   productName: string;
@@ -74,6 +78,7 @@ export interface MappedProductionOrder {
 
 export interface MappedShipment {
   id: string;
+  number: string;
   date: string;
   customer: string;
   status: 'draft' | 'shipped' | 'cancelled';
@@ -92,6 +97,7 @@ export interface MappedShipment {
 
 export interface MappedWriteOff {
   id: string;
+  number: string;
   date: string;
   type: 'losses' | 'defect' | 'spoilage' | 'inventory' | 'other';
   targetType: 'material';
@@ -108,6 +114,7 @@ export interface MappedWriteOff {
 
 export interface MappedInventoryAudit {
   id: string;
+  number: string;
   date: string;
   status: 'draft' | 'counted' | 'approved' | 'cancelled';
   location: string;
@@ -125,35 +132,45 @@ export interface MappedInventoryAudit {
 }
 
 export function mapPurchaseReceipt(doc: PurchaseReceiptDetail): MappedPurchaseReceipt {
-  const totalSum = doc.lines.reduce(
-    (sum, line) => sum + (line.totalPrice || line.quantity * (line.costPerUnit || 0)),
-    0
-  );
+  const totalSum = doc.lines.reduce((sum, line) => {
+    const quantity = toFiniteNumber(line.quantity);
+    const costPerUnit = toFiniteNumber(line.costPerUnit);
+    const total = line.totalPrice === null ? quantity * costPerUnit : toFiniteNumber(line.totalPrice);
+    return sum + total;
+  }, 0);
 
   return {
     id: doc.id,
+    number: doc.receiptNumber,
     date: doc.date ? new Date(doc.date).toLocaleDateString() : '',
     supplier: doc.supplier?.name || 'Без поставщика',
     warehouse: doc.targetLocation?.name || 'Основной склад',
     status: doc.status.toLowerCase() as MappedPurchaseReceipt['status'],
     totalSum,
     comment: '',
-    items: doc.lines.map((line) => ({
-      materialId: line.itemId,
-      materialName: line.itemName || line.item?.name || 'Неизвестно',
-      batchId: line.batchNumber,
-      batchName: line.batchNumber,
-      quantity: line.quantity,
-      unit: line.unitSymbol || line.unit?.symbol || 'кг',
-      pricePerUnit: line.costPerUnit || 0,
-      total: line.totalPrice || line.quantity * (line.costPerUnit || 0),
-    })),
+    items: doc.lines.map((line) => {
+      const quantity = toFiniteNumber(line.quantity);
+      const pricePerUnit = toFiniteNumber(line.costPerUnit);
+      const total = line.totalPrice === null ? quantity * pricePerUnit : toFiniteNumber(line.totalPrice);
+
+      return {
+        materialId: line.itemId,
+        materialName: line.itemName || line.item?.name || 'Неизвестно',
+        batchId: line.batchNumber,
+        batchName: line.batchNumber,
+        quantity,
+        unit: formatUnit(line.unitSymbol || line.unit?.symbol || 'кг'),
+        pricePerUnit,
+        total,
+      };
+    }),
   };
 }
 
 export function mapTransfer(doc: TransferDetail): MappedTransfer {
   return {
     id: doc.id,
+    number: doc.transferNumber,
     date: doc.date ? new Date(doc.date).toLocaleDateString() : '',
     fromLocation: doc.sourceLocation?.name || 'Склад',
     toLocation: doc.targetLocation?.name || 'Цех',
@@ -165,8 +182,8 @@ export function mapTransfer(doc: TransferDetail): MappedTransfer {
       materialName: line.itemName || line.item?.name || 'Неизвестно',
       batchId: line.batchId || '',
       batchName: line.batchNumber || line.batch?.batchNumber || '',
-      quantity: line.quantity,
-      unit: line.unitSymbol || line.unit?.symbol || 'кг',
+      quantity: toFiniteNumber(line.quantity),
+      unit: formatUnit(line.unitSymbol || line.unit?.symbol || 'кг'),
     })),
   };
 }
@@ -178,12 +195,13 @@ export function mapProductionOrder(doc: ProductionOrderDetail): MappedProduction
 
   return {
     id: doc.id,
+    number: doc.orderNumber,
     date: dateStr,
     productId: doc.targetItem?.id || '',
     productName: doc.targetItem?.name || 'Неизвестно',
     recipeId: doc.bomId || '',
-    plannedQuantity: doc.plannedQuantity,
-    actualQuantity: doc.actualQuantity || 0,
+    plannedQuantity: toFiniteNumber(doc.plannedQuantity),
+    actualQuantity: toFiniteNumber(doc.actualQuantity),
     responsible: 'Администратор',
     status: doc.status.toLowerCase() as MappedProductionOrder['status'],
     startDate,
@@ -191,37 +209,46 @@ export function mapProductionOrder(doc: ProductionOrderDetail): MappedProduction
     plannedMaterials: (doc.plannedLines || []).map((line) => ({
       materialId: line.itemId,
       materialName: line.itemName || 'Неизвестно',
-      quantity: line.plannedQuantity,
-      unit: line.unitSymbol || 'кг',
+      quantity: toFiniteNumber(line.plannedQuantity),
+      unit: formatUnit(line.unitSymbol || 'кг'),
     })),
     actualMaterialsUsed: (doc.consumptions || []).map((line) => ({
       materialId: line.itemId,
       materialName: line.itemName || 'Неизвестно',
       batchId: line.batchNumber || undefined,
-      quantity: line.quantity,
-      unit: line.unitSymbol || 'кг',
+      quantity: toFiniteNumber(line.quantity),
+      unit: formatUnit(line.unitSymbol || 'кг'),
     })),
   };
 }
 
 export function mapShipment(doc: ShipmentDetail): MappedShipment {
-  const totalSum = (doc.lines || []).reduce((sum, line) => sum + line.quantity * (line.pricePerUnit || 0), 0);
+  const totalSum = (doc.lines || []).reduce(
+    (sum, line) => sum + toFiniteNumber(line.quantity) * toFiniteNumber(line.pricePerUnit),
+    0
+  );
   return {
     id: doc.id,
+    number: doc.shipmentNumber,
     date: doc.date ? new Date(doc.date).toLocaleDateString() : '',
     customer: doc.customer?.name || 'Без контрагента',
     status: doc.status.toLowerCase() as MappedShipment['status'],
     totalSum,
     responsible: 'Администратор',
     comment: '',
-    items: (doc.lines || []).map((line) => ({
-      productId: line.itemId,
-      productName: line.itemName || line.item?.name || 'Неизвестно',
-      quantity: line.quantity,
-      unit: line.unitSymbol || line.unit?.symbol || 'меш',
-      price: line.pricePerUnit || 0,
-      total: line.quantity * (line.pricePerUnit || 0),
-    })),
+    items: (doc.lines || []).map((line) => {
+      const quantity = toFiniteNumber(line.quantity);
+      const price = toFiniteNumber(line.pricePerUnit);
+
+      return {
+        productId: line.itemId,
+        productName: line.itemName || line.item?.name || 'Неизвестно',
+        quantity,
+        unit: formatUnit(line.unitSymbol || line.unit?.symbol || 'меш.'),
+        price,
+        total: quantity * price,
+      };
+    }),
   };
 }
 
@@ -238,6 +265,7 @@ export function mapWriteOff(doc: WriteOffDetail): MappedWriteOff {
 
   return {
     id: doc.id,
+    number: doc.writeOffNumber,
     date: doc.date ? new Date(doc.date).toLocaleDateString() : '',
     type: reasonMap[doc.reason] || 'other',
     targetType: 'material',
@@ -245,8 +273,8 @@ export function mapWriteOff(doc: WriteOffDetail): MappedWriteOff {
     targetName: primaryLine?.itemName || primaryLine?.item?.name || '',
     batchId: primaryLine?.batchNumber || primaryLine?.batch?.batchNumber || undefined,
     batchName: primaryLine?.batchNumber || primaryLine?.batch?.batchNumber || undefined,
-    quantity: primaryLine?.quantity || 0,
-    unit: primaryLine?.unitSymbol || primaryLine?.unit?.symbol || 'кг',
+    quantity: toFiniteNumber(primaryLine?.quantity),
+    unit: formatUnit(primaryLine?.unitSymbol || primaryLine?.unit?.symbol || 'кг'),
     reason: doc.description || '',
     responsible: 'Администратор',
     status: doc.status.toLowerCase() as MappedWriteOff['status'],
@@ -256,6 +284,7 @@ export function mapWriteOff(doc: WriteOffDetail): MappedWriteOff {
 export function mapInventoryAudit(doc: InventoryAuditDetail): MappedInventoryAudit {
   return {
     id: doc.id,
+    number: doc.auditNumber,
     date: doc.auditDate ? new Date(doc.auditDate).toLocaleDateString() : '',
     status: doc.status.toLowerCase() as MappedInventoryAudit['status'],
     location: doc.location?.name || 'Склад',
@@ -265,10 +294,10 @@ export function mapInventoryAudit(doc: InventoryAuditDetail): MappedInventoryAud
       unitId: line.unitId,
       batchId: line.batchId || '',
       batchName: line.batchNumber || line.batch?.batchNumber || '',
-      expected: line.expectedQuantity,
-      actual: line.actualQuantity,
-      discrepancy: line.discrepancyQuantity,
-      unit: line.unitSymbol || line.unit?.symbol || 'кг',
+      expected: toFiniteNumber(line.expectedQuantity),
+      actual: toFiniteNumber(line.actualQuantity),
+      discrepancy: toFiniteNumber(line.discrepancyQuantity),
+      unit: formatUnit(line.unitSymbol || line.unit?.symbol || 'кг'),
     })),
   };
 }

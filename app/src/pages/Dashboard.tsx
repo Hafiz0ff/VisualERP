@@ -4,6 +4,7 @@ import { mapDashboardStats } from '../api/mappers/dashboard.mapper'
 import type { DashboardResponse } from '../api/types'
 import { Warehouse, Factory, PackageCheck, AlertTriangle, TrendingUp, ArrowRightLeft, FlaskConical, LogIn, Truck, FileMinus, Clock, ClipboardList } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { formatNumber } from '@/lib/number-format'
 
 const monthlyData = [
   { day: '01', income: 180, expense: 120 }, { day: '05', income: 190, expense: 130 },
@@ -17,6 +18,27 @@ const rawMaterialDist = [
   { name: 'Добавки', value: 20, color: '#5A8A6E' }, { name: 'Упаковка', value: 10, color: '#F0A830' },
   { name: 'Пигменты', value: 5, color: '#9E9E9E' },
 ]
+
+const dashboardEntityLabels: Record<string, string> = {
+  PurchaseReceipt: 'Приход сырья',
+  Transfer: 'Перемещение сырья',
+  ProductionOrder: 'Производство',
+  Shipment: 'Отгрузка',
+  WriteOff: 'Списание',
+  InventoryAudit: 'Инвентаризация',
+}
+
+const dashboardActionLabels: Record<string, string> = {
+  CREATE: 'создание',
+  UPDATE: 'изменение',
+  POST: 'проведение',
+  SHIP: 'отгрузка',
+  CANCEL: 'отмена',
+  COUNT: 'подсчёт',
+  APPROVE: 'утверждение',
+  START: 'запуск',
+  COMPLETE: 'завершение',
+}
 
 export default function Dashboard() {
   const { data: dashboardResponse, loading, error, refetch } = useApiQuery<{ data: DashboardResponse }>('/api/dashboard')
@@ -44,9 +66,9 @@ export default function Dashboard() {
       : 'draft';
 
     return {
-      id: event.entityId,
+      id: dashboardEntityLabels[event.entityType] || 'Операция',
       type: mappedType,
-      productName: event.summary,
+      productName: `${dashboardEntityLabels[event.entityType] || event.entityType}: ${dashboardActionLabels[event.action] || event.action.toLowerCase()}`,
       date: new Date(event.timestamp).toLocaleDateString(),
       status,
     };
@@ -103,7 +125,7 @@ export default function Dashboard() {
               <div className="p-1.5 bg-[#F6F5F2] rounded"><c.icon size={18} style={{ color: c.color }} strokeWidth={2} /></div>
               <span className="text-[10px] text-[#9E9E9E] font-medium">{c.sub}</span>
             </div>
-            <div className={`text-[26px] font-bold leading-tight ${c.alert ? 'text-[#C0563F]' : 'text-[#2B2B2B]'}`}>{c.val === null ? '—' : c.val.toLocaleString()}</div>
+            <div className={`text-[26px] font-bold leading-tight ${c.alert ? 'text-[#C0563F]' : 'text-[#2B2B2B]'}`}>{c.val === null ? '—' : formatNumber(c.val)}</div>
             <div className="text-[11px] text-[#5E5E5E] mt-0.5">{c.label}</div>
           </div>
         ))}
@@ -120,7 +142,7 @@ export default function Dashboard() {
           <div key={i} className="bg-white border border-[#D4CFC8] p-4 flex items-center gap-3">
             <div className="p-2 rounded" style={{ backgroundColor: `${c.color}15` }}><c.icon size={16} style={{ color: c.color }} strokeWidth={2} /></div>
             <div>
-              <div className="text-[18px] font-bold text-[#2B2B2B]">{c.val === null ? '—' : c.val.toLocaleString()}</div>
+              <div className="text-[18px] font-bold text-[#2B2B2B]">{c.val === null ? '—' : formatNumber(c.val)}</div>
               <div className="text-[10px] text-[#5E5E5E]">{c.label}</div>
             </div>
           </div>

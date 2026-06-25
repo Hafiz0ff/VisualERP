@@ -8,6 +8,7 @@ import { generateIdempotencyKey } from '../api/idempotency'
 import { handleApiError } from '../api/errors'
 import type { Item, StockBalanceRow, ShipmentDetail, Customer, StockLocation } from '../api/types'
 import { Plus, X, AlertTriangle } from 'lucide-react'
+import { formatCurrency, formatNumber } from '@/lib/number-format'
 
 interface ShItem {
   productId: string;
@@ -265,7 +266,7 @@ export default function Shipments() {
         <div className="bg-white border border-[#D4CFC8] p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Код: {detailShipment.id}</span>
+              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Накладная: {detailShipment.number}</span>
               <span className="text-[18px] font-semibold text-[#2B2B2B]">{detailShipment.customer}</span>
               <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${detailShipment.status === 'shipped' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : detailShipment.status === 'draft' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>
                 {detailShipment.status === 'shipped' ? 'Отгружено' : detailShipment.status === 'draft' ? 'Черновик' : 'Отменено'}
@@ -281,7 +282,7 @@ export default function Shipments() {
                 <div><span className="text-[#9E9E9E]">Дата:</span> <span className="font-medium">{detailShipment.date}</span></div>
                 <div><span className="text-[#9E9E9E]">Склад отгрузки:</span> <span className="font-medium">{shipmentDetailRes?.sourceLocation.name}</span></div>
                 <div><span className="text-[#9E9E9E]">Ответственный:</span> <span className="font-medium">{detailShipment.responsible}</span></div>
-                <div><span className="text-[#9E9E9E]">Итоговая сумма:</span> <span className="font-medium">{detailShipment.totalSum.toLocaleString()} ₽</span></div>
+                <div><span className="text-[#9E9E9E]">Итоговая сумма:</span> <span className="font-medium">{formatCurrency(detailShipment.totalSum)}</span></div>
               </div>
               <div className="mb-4">
                 <h4 className="text-[12px] font-semibold mb-2 font-mono">Состав отгрузки</h4>
@@ -298,9 +299,9 @@ export default function Shipments() {
                     {detailShipment.items.map((it, i) => (
                       <tr key={i} className="bg-white">
                         <td className="px-3 py-2 text-[12px]">{it.productName}</td>
-                        <td className="px-3 py-2 text-[12px] text-right font-mono">{it.quantity} {it.unit}</td>
-                        <td className="px-3 py-2 text-[12px] text-right font-mono">{it.price.toLocaleString()} ₽</td>
-                        <td className="px-3 py-2 text-[12px] text-right font-mono">{it.total.toLocaleString()} ₽</td>
+                        <td className="px-3 py-2 text-[12px] text-right font-mono">{formatNumber(it.quantity)} {it.unit}</td>
+                        <td className="px-3 py-2 text-[12px] text-right font-mono">{formatCurrency(it.price)}</td>
+                        <td className="px-3 py-2 text-[12px] text-right font-mono">{formatCurrency(it.total)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -308,12 +309,12 @@ export default function Shipments() {
               </div>
               <div className="flex gap-2">
                 {detailShipment.status === 'draft' && (
-                  <button onClick={() => handleActionClick('ship', detailShipment.id, detailShipment.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">
+                  <button onClick={() => handleActionClick('ship', detailShipment.id, detailShipment.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">
                     Отгрузить
                   </button>
                 )}
                 {detailShipment.status === 'draft' && (
-                  <button onClick={() => handleActionClick('cancel', detailShipment.id, detailShipment.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">
+                  <button onClick={() => handleActionClick('cancel', detailShipment.id, detailShipment.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">
                     Отменить
                   </button>
                 )}
@@ -336,10 +337,10 @@ export default function Shipments() {
             </tr></thead>
               <tbody className="divide-y divide-[#F6F5F2]">{shipments.slice().reverse().map((sh) => (
                 <tr key={sh.id} className={`h-12 hover:bg-[#EFEBE6] cursor-pointer ${detailId === sh.id ? 'bg-[#F6F5F2]' : 'bg-white'}`} onClick={() => setDetailId(detailId === sh.id ? null : sh.id)}>
-                  <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{sh.id}</td><td className="px-4 text-[12px]">{sh.date}</td>
+                  <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{sh.number}</td><td className="px-4 text-[12px]">{sh.date}</td>
                   <td className="px-4 text-[12px] font-medium">{sh.customer}</td>
-                  <td className="px-4 text-[12px]">{sh.items.length} поз.<br/><span className="text-[10px] text-[#9E9E9E]">{sh.items.map((it) => `${it.productName} ×${it.quantity}`).join(', ')}</span></td>
-                  <td className="px-4 text-[12px] text-right font-mono">{sh.totalSum.toLocaleString()} ₽</td>
+                  <td className="px-4 text-[12px]">{sh.items.length} поз.<br/><span className="text-[10px] text-[#9E9E9E]">{sh.items.map((it) => `${it.productName} ×${formatNumber(it.quantity)}`).join(', ')}</span></td>
+                  <td className="px-4 text-[12px] text-right font-mono">{formatCurrency(sh.totalSum)}</td>
                   <td className="px-4 text-[12px] text-[#5E5E5E]">{sh.responsible}</td>
                   <td className="px-4 text-center"><span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${sh.status === 'shipped' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : sh.status === 'draft' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>{sh.status === 'shipped' ? 'Отгружено' : sh.status === 'draft' ? 'Черновик' : 'Отменено'}</span></td>
                 </tr>

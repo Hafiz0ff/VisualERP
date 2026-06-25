@@ -131,7 +131,7 @@ export default function Workshop() {
                 <div className="text-center p-8 text-[12px] text-[#5E5E5E]">Нет активных заказов в работе.</div>
               ) : (
                 inProgress.map((o) => (
-                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.id}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#2A5C8D]/15 text-[#2A5C8D]">В работе</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.plannedQuantity} мешков | {o.responsible}{o.startDate && ` | с ${o.startDate}`}</div></div>
+                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.number}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#2A5C8D]/15 text-[#2A5C8D]">В работе</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.plannedQuantity} мешков | {o.responsible}{o.startDate && ` | с ${o.startDate}`}</div></div>
                 ))
               )}
             </div>
@@ -146,7 +146,7 @@ export default function Workshop() {
                 <div className="text-center p-8 text-[12px] text-[#5E5E5E]">Нет запланированных заказов.</div>
               ) : (
                 planned.map((o) => (
-                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.id}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#9E9E9E]/15 text-[#9E9E9E]">План</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.plannedQuantity} мешков | {o.responsible}</div></div>
+                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.number}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#9E9E9E]/15 text-[#9E9E9E]">План</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.plannedQuantity} мешков | {o.responsible}</div></div>
                 ))
               )}
             </div>
@@ -158,7 +158,7 @@ export default function Workshop() {
                 <div className="text-center p-8 text-[12px] text-[#5E5E5E]">Сегодня еще нет выполненных заказов.</div>
               ) : (
                 completedToday.map((o) => (
-                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.id}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#5A8A6E]/15 text-[#5A8A6E]">Выполнено</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.actualQuantity || o.plannedQuantity} мешков | {o.responsible}{o.endDate && ` | ${o.endDate}`}</div></div>
+                  <div key={o.id} className="px-5 py-3"><div className="flex justify-between"><span className="text-[12px] font-mono text-[#5E5E5E]">{o.number}</span><span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded bg-[#5A8A6E]/15 text-[#5A8A6E]">Выполнено</span></div><div className="text-[13px] font-medium">{o.productName}</div><div className="text-[11px] text-[#9E9E9E]">{o.actualQuantity || o.plannedQuantity} мешков | {o.responsible}{o.endDate && ` | ${o.endDate}`}</div></div>
                 ))
               )}
             </div>

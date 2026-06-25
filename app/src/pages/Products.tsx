@@ -3,6 +3,7 @@ import { useApiQuery } from '../hooks/useApiQuery'
 import { mapFinishedProducts } from '../api/mappers/items.mapper'
 import type { Item, StockBalanceRow, ProductionOrderDetail } from '../api/types'
 import { AlertTriangle } from 'lucide-react'
+import { formatCurrency, formatNumber, toFiniteNumber } from '@/lib/number-format'
 
 export default function Products() {
   const { data: itemsRes, loading: loadingItems, error: errorItems, refetch: refetchItems } = useApiQuery<{ data: Item[] }>('/api/items', { params: { pageSize: 100 } })
@@ -33,11 +34,11 @@ export default function Products() {
 
     const producedToday = pOrders
       .filter((o) => o.completedAt && new Date(o.completedAt) >= startOfDay)
-      .reduce((sum, o) => sum + (o.actualQuantity || 0), 0)
+      .reduce((sum, o) => sum + toFiniteNumber(o.actualQuantity), 0)
 
     const producedMonth = pOrders
       .filter((o) => o.completedAt && new Date(o.completedAt) >= startOfMonth)
-      .reduce((sum, o) => sum + (o.actualQuantity || 0), 0)
+      .reduce((sum, o) => sum + toFiniteNumber(o.actualQuantity), 0)
 
     return {
       ...p,
@@ -85,9 +86,9 @@ export default function Products() {
     <Layout title="Готовая продукция">
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Позиций</div><div className="text-[24px] font-bold">{finishedProducts.length}</div></div>
-        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Остаток (меш.)</div><div className="text-[24px] font-bold">{ts.toLocaleString()}</div></div>
-        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Выпущено за месяц</div><div className="text-[24px] font-bold">{tm.toLocaleString()}</div></div>
-        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Стоимость остатков</div><div className="text-[24px] font-bold">{hasProductPrices ? `${tv.toLocaleString()} ₽` : '—'}</div></div>
+        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Остаток (меш.)</div><div className="text-[24px] font-bold">{formatNumber(ts)}</div></div>
+        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Выпущено за месяц</div><div className="text-[24px] font-bold">{formatNumber(tm)}</div></div>
+        <div className="bg-white border border-[#D4CFC8] p-4"><div className="text-[12px] text-[#5E5E5E] mb-1">Стоимость остатков</div><div className="text-[24px] font-bold">{hasProductPrices ? formatCurrency(tv) : '—'}</div></div>
       </div>
 
       <div className="bg-white border border-[#D4CFC8]">
@@ -109,11 +110,11 @@ export default function Products() {
                   <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{p.id}</td>
                   <td className="px-4 text-[13px] font-medium">{p.name}</td>
                   <td className="px-4 text-[12px] text-[#5E5E5E]">{p.packaging}</td>
-                  <td className="px-4 text-[13px] text-right font-mono">{p.stock.toLocaleString()}</td>
-                  <td className="px-4 text-[13px] text-[#5A8A6E] text-right font-mono font-medium">+{p.producedToday.toLocaleString()}</td>
-                  <td className="px-4 text-[12px] text-right font-mono">{p.producedMonth.toLocaleString()}</td>
-                  <td className="px-4 text-[12px] text-right font-mono">{p.price === null ? '—' : p.price.toLocaleString()}</td>
-                  <td className="px-4 text-[12px] text-right font-mono">{p.price === null ? '—' : (p.stock * p.price).toLocaleString()}</td>
+                  <td className="px-4 text-[13px] text-right font-mono">{formatNumber(p.stock)}</td>
+                  <td className="px-4 text-[13px] text-[#5A8A6E] text-right font-mono font-medium">+{formatNumber(p.producedToday)}</td>
+                  <td className="px-4 text-[12px] text-right font-mono">{formatNumber(p.producedMonth)}</td>
+                  <td className="px-4 text-[12px] text-right font-mono">{p.price === null ? '—' : formatNumber(p.price)}</td>
+                  <td className="px-4 text-[12px] text-right font-mono">{p.price === null ? '—' : formatNumber(p.stock * p.price)}</td>
                 </tr>
               ))}
             </tbody>
@@ -121,7 +122,7 @@ export default function Products() {
         </div>
         <div className="px-4 py-3 border-t border-[#D4CFC8] flex items-center justify-between">
           <span className="text-[11px] text-[#9E9E9E]">Итого: {finishedProducts.length} позиций</span>
-          <span className="text-[12px] font-medium">Общая стоимость: {hasProductPrices ? `${tv.toLocaleString()} ₽` : '—'}</span>
+          <span className="text-[12px] font-medium">Общая стоимость: {hasProductPrices ? formatCurrency(tv) : '—'}</span>
         </div>
       </div>
     </Layout>

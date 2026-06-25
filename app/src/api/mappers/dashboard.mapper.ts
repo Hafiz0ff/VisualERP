@@ -1,4 +1,5 @@
 import type { DashboardResponse } from '../types';
+import { toFiniteNumber } from '@/lib/number-format';
 
 export interface MappedDashboardStats {
   rawMaterialsTotal: number;
@@ -34,28 +35,28 @@ export function mapDashboardStats(data: DashboardResponse | null): MappedDashboa
   const stockSummary = data.stockSummary || {};
   const qtyByType = stockSummary.totalQtyByType || {};
 
-  const rawMaterialsTotal = stockSummary.totalStockItems || 0;
-  const finishedProductsTotal = Number(qtyByType['FINISHED_PRODUCT'] || 0) + Number(qtyByType['SEMI_FINISHED'] || 0);
+  const rawMaterialsTotal = toFiniteNumber(stockSummary.totalStockItems);
+  const finishedProductsTotal = toFiniteNumber(qtyByType['FINISHED_PRODUCT']) + toFiniteNumber(qtyByType['SEMI_FINISHED']);
 
   // Sum up pending documents
   const pendingDocs =
-    (data.pendingDocuments?.draftPurchaseReceiptsCount || 0) +
-    (data.pendingDocuments?.draftTransfersCount || 0) +
-    (data.pendingDocuments?.draftShipmentsCount || 0) +
-    (data.pendingDocuments?.draftWriteOffsCount || 0) +
-    (data.pendingDocuments?.countedInventoryAuditsCount || 0);
+    toFiniteNumber(data.pendingDocuments?.draftPurchaseReceiptsCount) +
+    toFiniteNumber(data.pendingDocuments?.draftTransfersCount) +
+    toFiniteNumber(data.pendingDocuments?.draftShipmentsCount) +
+    toFiniteNumber(data.pendingDocuments?.draftWriteOffsCount) +
+    toFiniteNumber(data.pendingDocuments?.countedInventoryAuditsCount);
 
   return {
     rawMaterialsTotal,
     rawMaterialsInWorkshop: null,
     finishedProductsTotal,
     lowStockCount: data.lowStockItems?.length || 0,
-    producedToday: data.productionSummary?.byStatus?.['COMPLETED'] || 0,
-    producedMonth: data.productionSummary?.completedCurrentMonthCount || 0,
+    producedToday: toFiniteNumber(data.productionSummary?.byStatus?.['COMPLETED']),
+    producedMonth: toFiniteNumber(data.productionSummary?.completedCurrentMonthCount),
     incomingMonth: null,
-    shippedMonth: data.shipmentSummary?.shippedCurrentMonthCount || 0,
-    writeOffMonth: data.writeOffSummary?.postedCurrentMonthCount || 0,
-    activeProd: data.productionSummary?.byStatus?.['IN_PROGRESS'] || 0,
+    shippedMonth: toFiniteNumber(data.shipmentSummary?.shippedCurrentMonthCount),
+    writeOffMonth: toFiniteNumber(data.writeOffSummary?.postedCurrentMonthCount),
+    activeProd: toFiniteNumber(data.productionSummary?.byStatus?.['IN_PROGRESS']),
     pendingDocs,
   };
 }

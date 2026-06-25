@@ -224,7 +224,7 @@ export default function Transfers() {
         <div className="bg-white border border-[#D4CFC8] p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">{detailTransfer.id}</span>
+              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">{detailTransfer.number}</span>
               <span className="text-[12px] text-[#5E5E5E]">{detailTransfer.date}</span>
               <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${detailTransfer.status === 'completed' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : detailTransfer.status === 'pending' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>{detailTransfer.status === 'completed' ? 'Выполнено' : detailTransfer.status === 'pending' ? 'Ожидает' : 'Отменена'}</span>
             </div>
@@ -246,8 +246,8 @@ export default function Transfers() {
               </table>
               {detailTransfer.status === 'pending' && (
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => handleActionClick('post', detailTransfer.id, detailTransfer.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">Принять передачу</button>
-                  <button onClick={() => handleActionClick('cancel', detailTransfer.id, detailTransfer.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить перемещение</button>
+                  <button onClick={() => handleActionClick('post', detailTransfer.id, detailTransfer.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">Принять передачу</button>
+                  <button onClick={() => handleActionClick('cancel', detailTransfer.id, detailTransfer.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить перемещение</button>
                 </div>
               )}
             </>
@@ -264,7 +264,7 @@ export default function Transfers() {
           </tr></thead>
             <tbody className="divide-y divide-[#F6F5F2]">{transferOrders.slice().reverse().map((t) => (
               <tr key={t.id} className={`h-12 hover:bg-[#EFEBE6] cursor-pointer ${detailId === t.id ? 'bg-[#F6F5F2]' : 'bg-white'}`} onClick={() => setDetailId(detailId === t.id ? null : t.id)}>
-                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{t.id}</td>
+                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{t.number}</td>
                 <td className="px-4 text-[12px]">{t.date}</td>
                 <td className="px-4 text-[12px] font-medium">{t.fromLocation} ➔ {t.toLocation}</td>
                 <td className="px-4 text-[12px]">{t.items.length} поз.<br/><span className="text-[10px] text-[#9E9E9E]">{t.items.map((it) => it.materialName).join(', ')}</span></td>

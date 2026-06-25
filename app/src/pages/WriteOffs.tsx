@@ -7,6 +7,7 @@ import { generateIdempotencyKey } from '../api/idempotency'
 import { handleApiError } from '../api/errors'
 import type { Item, WriteOffDetail, StockLocation } from '../api/types'
 import { Plus, X } from 'lucide-react'
+import { formatNumber } from '@/lib/number-format'
 
 const writeOffReasons = [
   { key: 'TECHNOLOGICAL_LOSS', label: 'Технологические потери' },
@@ -200,7 +201,7 @@ export default function WriteOffs() {
         <div className="bg-white border border-[#D4CFC8] p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Код: {detailWriteOff.id}</span>
+              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">Документ: {detailWriteOff.number}</span>
               <span className="text-[18px] font-semibold text-[#2B2B2B]">{detailWriteOff.targetName}</span>
               <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${detailWriteOff.status === 'posted' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : detailWriteOff.status === 'draft' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>
                 {detailWriteOff.status === 'posted' ? 'Проведен' : detailWriteOff.status === 'draft' ? 'Черновик' : 'Отменен'}
@@ -214,7 +215,7 @@ export default function WriteOffs() {
             <>
               <div className="grid grid-cols-4 gap-4 mb-4 text-[12px]">
                 <div><span className="text-[#9E9E9E]">Объект:</span> <span className="font-medium">{detailWriteOff.targetName}</span></div>
-                <div><span className="text-[#9E9E9E]">Количество:</span> <span className="font-medium">{detailWriteOff.quantity} {detailWriteOff.unit}</span></div>
+                <div><span className="text-[#9E9E9E]">Количество:</span> <span className="font-medium">{formatNumber(detailWriteOff.quantity)} {detailWriteOff.unit}</span></div>
                 <div><span className="text-[#9E9E9E]">Причина/Категория:</span> <span className="font-medium">{writeOffReasons.find((r) => r.key === writeOffDetailRes?.reason)?.label || detailWriteOff.type}</span></div>
                 <div><span className="text-[#9E9E9E]">Склад списания:</span> <span className="font-medium">{writeOffDetailRes?.location.name}</span></div>
               </div>
@@ -224,8 +225,8 @@ export default function WriteOffs() {
               </div>
               {detailWriteOff.status === 'draft' && (
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => handleActionClick('post', detailWriteOff.id, detailWriteOff.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">Провести списание</button>
-                  <button onClick={() => handleActionClick('cancel', detailWriteOff.id, detailWriteOff.id.substring(0, 8))} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить</button>
+                  <button onClick={() => handleActionClick('post', detailWriteOff.id, detailWriteOff.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#5A8A6E] rounded hover:bg-[#4A7A5E]">Провести списание</button>
+                  <button onClick={() => handleActionClick('cancel', detailWriteOff.id, detailWriteOff.number)} className="h-8 px-4 text-[12px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835]">Отменить</button>
                 </div>
               )}
             </>
@@ -245,10 +246,10 @@ export default function WriteOffs() {
           </tr></thead>
             <tbody className="divide-y divide-[#F6F5F2]">{writeOffs.slice().reverse().map((w) => (
               <tr key={w.id} className={`h-12 cursor-pointer hover:bg-[#EFEBE6] ${detailId === w.id ? 'bg-[#F6F5F2]' : 'bg-white'}`} onClick={() => setDetailId(detailId === w.id ? null : w.id)}>
-                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{w.id}</td>
+                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{w.number}</td>
                 <td className="px-4 text-[12px]">{w.date}</td>
                 <td className="px-4 text-[12px] font-medium">{w.targetName}</td>
-                <td className="px-4 text-[12px] text-right font-mono">{w.quantity} {w.unit}</td>
+                <td className="px-4 text-[12px] text-right font-mono">{formatNumber(w.quantity)} {w.unit}</td>
                 <td className="px-4 text-[12px]">{writeOffReasons.find((r) => r.key === (writeOffsRes?.data || []).find((x) => x.id === w.id)?.reason)?.label || w.type}</td>
                 <td className="px-4 text-center"><span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${w.status === 'posted' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : w.status === 'draft' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>{w.status === 'posted' ? 'Проведен' : w.status === 'draft' ? 'Черновик' : 'Отменен'}</span></td>
               </tr>

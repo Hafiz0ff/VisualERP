@@ -31,6 +31,18 @@ const docTypeLabels: Record<string, string> = {
   'InventoryAudit': 'Инвентаризация',
 }
 
+const actionLabels: Record<string, string> = {
+  'CREATE': 'Создание',
+  'UPDATE': 'Изменение',
+  'POST': 'Проведение',
+  'SHIP': 'Отгрузка',
+  'CANCEL': 'Отмена',
+  'COUNT': 'Подсчёт',
+  'APPROVE': 'Утверждение',
+  'START': 'Запуск',
+  'COMPLETE': 'Завершение',
+}
+
 interface AuditEvent {
   id: string
   timestamp: string
@@ -50,23 +62,29 @@ export default function AuditLog() {
 
   const rawEvents = dashboardRes?.data.recentAuditEvents || []
 
-  const mappedEvents = rawEvents.map((e) => ({
-    id: e.id,
-    timestamp: e.timestamp ? new Date(e.timestamp).toLocaleString() : '',
-    user: e.userFullName || e.userEmail || 'Система',
-    action: e.action,
-    documentType: e.entityType,
-    documentId: e.entityId,
-    object: e.summary,
-    oldValue: '',
-    newValue: '',
-    status: 'Успешно',
-  }))
+  const mappedEvents = rawEvents.map((e) => {
+    const docType = docTypeLabels[e.entityType] || e.entityType
+    const action = actionLabels[e.action] || e.action
+
+    return {
+      id: e.id,
+      timestamp: e.timestamp ? new Date(e.timestamp).toLocaleString() : '',
+      user: e.userFullName || e.userEmail || 'Система',
+      action: e.action,
+      actionLabel: action,
+      documentType: e.entityType,
+      documentId: docType,
+      object: `${docType}: ${action.toLowerCase()}`,
+      oldValue: '',
+      newValue: '',
+      status: 'Успешно',
+    }
+  })
 
   const filtered = mappedEvents.filter((e) => {
     const searchLower = search.toLowerCase()
     const ms =
-      e.action.toLowerCase().includes(searchLower) ||
+      e.actionLabel.toLowerCase().includes(searchLower) ||
       e.object.toLowerCase().includes(searchLower) ||
       e.user.toLowerCase().includes(searchLower) ||
       e.documentId.toLowerCase().includes(searchLower)
@@ -137,7 +155,7 @@ export default function AuditLog() {
                 <tr key={e.id} className={`h-12 ${idx % 2 === 1 ? 'bg-[#F6F5F2]' : 'bg-white'} hover:bg-[#EFEBE6]`}>
                   <td className="px-4 text-[11px] font-mono text-[#5E5E5E] whitespace-nowrap">{e.timestamp}</td>
                   <td className="px-4 text-[12px] font-medium text-[#2B2B2B]">{e.user}</td>
-                  <td className="px-4"><span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded ${actionColors[e.action] || 'bg-[#9E9E9E]/10 text-[#9E9E9E]'}`}>{e.action}</span></td>
+                  <td className="px-4"><span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded ${actionColors[e.action] || 'bg-[#9E9E9E]/10 text-[#9E9E9E]'}`}>{e.actionLabel}</span></td>
                   <td className="px-4"><span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded ${docColors[e.documentType] || 'bg-[#9E9E9E]/10 text-[#9E9E9E]'}`}>{docTypeLabels[e.documentType] || e.documentType}</span></td>
                   <td className="px-4 text-[11px] font-mono text-[#5E5E5E]">{e.documentId}</td>
                   <td className="px-4 text-[12px] text-[#2B2B2B]">{e.object}</td>

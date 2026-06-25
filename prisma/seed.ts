@@ -435,6 +435,11 @@ async function seedDemoOperationalScenario(input: {
   await InventoryAuditsService.create(organizationId, userId, {
     auditDate: dateFromToday(2),
     locationId: workshop,
+    lines: [
+      { itemId: cement, unitId: kg, batchId: cementBatch.id },
+      { itemId: sand, unitId: kg, batchId: sandBatch.id },
+      { itemId: bag25, unitId: pcs, batchId: bag25Batch.id },
+    ],
   });
 
   console.log('Realistic demo workflow seeded successfully.');

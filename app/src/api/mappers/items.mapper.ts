@@ -1,4 +1,5 @@
 import type { Item, StockBalanceRow } from '../types';
+import { formatUnit, toFiniteNumber } from '@/lib/number-format';
 
 export interface MappedRawMaterial {
   id: string;
@@ -40,9 +41,9 @@ export function mapRawMaterials(items: Item[], balances: StockBalanceRow[]): Map
         nameLower.includes('производ');
       
       if (isWorkshop) {
-        workshopStock += bal.quantity;
+        workshopStock += toFiniteNumber(bal.quantity);
       } else {
-        warehouseStock += bal.quantity;
+        warehouseStock += toFiniteNumber(bal.quantity);
       }
     });
 
@@ -54,7 +55,7 @@ export function mapRawMaterials(items: Item[], balances: StockBalanceRow[]): Map
       id: item.id,
       name: item.name,
       category: item.category?.name || 'Без категории',
-      unit: item.unit.symbol,
+      unit: formatUnit(item.unit.symbol),
       warehouseStock,
       workshopStock,
       minStock: null,
@@ -68,13 +69,13 @@ export function mapRawMaterials(items: Item[], balances: StockBalanceRow[]): Map
 export function mapFinishedProducts(items: Item[], balances: StockBalanceRow[]): MappedFinishedProduct[] {
   return items.map((item) => {
     const itemBalances = balances.filter((b) => b.itemId === item.id);
-    const stock = itemBalances.reduce((sum, b) => sum + b.quantity, 0);
+    const stock = itemBalances.reduce((sum, b) => sum + toFiniteNumber(b.quantity), 0);
 
     return {
       id: item.id,
       name: item.name,
       packaging: item.description || '—',
-      unit: item.unit.symbol,
+      unit: formatUnit(item.unit.symbol),
       stock,
       producedToday: 0, // derived dynamically at production order page level
       producedMonth: 0,

@@ -324,17 +324,43 @@ export class DashboardService {
       },
     });
 
-    const recentAuditEvents = rawAuditLogs.map((log) => ({
-      id: log.id,
-      timestamp: log.timestamp,
-      userId: log.userId,
-      userEmail: log.user?.email || null,
-      userFullName: log.user ? `${log.user.firstName} ${log.user.lastName}`.trim() : null,
-      action: log.action,
-      entityType: log.entityType,
-      entityId: log.entityId,
-      summary: `${log.action} performed on ${log.entityType} (${log.entityId})`,
-    }));
+    const entityLabels: Record<string, string> = {
+      PurchaseReceipt: 'Приход сырья',
+      Transfer: 'Перемещение сырья',
+      ProductionOrder: 'Производство',
+      Shipment: 'Отгрузка',
+      WriteOff: 'Списание',
+      InventoryAudit: 'Инвентаризация',
+    };
+
+    const actionLabels: Record<string, string> = {
+      CREATE: 'создание',
+      UPDATE: 'изменение',
+      POST: 'проведение',
+      SHIP: 'отгрузка',
+      CANCEL: 'отмена',
+      COUNT: 'подсчет',
+      APPROVE: 'утверждение',
+      START: 'запуск',
+      COMPLETE: 'завершение',
+    };
+
+    const recentAuditEvents = rawAuditLogs.map((log) => {
+      const entityLabel = entityLabels[log.entityType] || log.entityType;
+      const actionLabel = actionLabels[log.action] || log.action.toLowerCase();
+
+      return {
+        id: log.id,
+        timestamp: log.timestamp,
+        userId: log.userId,
+        userEmail: log.user?.email || null,
+        userFullName: log.user ? `${log.user.firstName} ${log.user.lastName}`.trim() : null,
+        action: log.action,
+        entityType: log.entityType,
+        entityId: log.entityId,
+        summary: `${entityLabel}: ${actionLabel}`,
+      };
+    });
 
     return {
       stockSummary,

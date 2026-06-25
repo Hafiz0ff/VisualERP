@@ -7,6 +7,7 @@ import { generateIdempotencyKey } from '../api/idempotency'
 import { handleApiError } from '../api/errors'
 import type { Item, StockBalanceRow, InventoryAuditDetail, StockLocation } from '../api/types'
 import { Plus, X, AlertTriangle } from 'lucide-react'
+import { formatNumber, toFiniteNumber } from '@/lib/number-format'
 
 interface LocalCountLine {
   itemId: string;
@@ -142,8 +143,8 @@ export default function InventoryAudits() {
       unitSymbol: line.unitSymbol || line.unit?.symbol || '',
       batchId: line.batchId || null,
       batchNumber: line.batchNumber || line.batch?.batchNumber || null,
-      expectedQuantity: line.expectedQuantity,
-      actualQuantity: line.actualQuantity,
+      expectedQuantity: toFiniteNumber(line.expectedQuantity),
+      actualQuantity: toFiniteNumber(line.actualQuantity),
     }))
     setCounts(lines)
   }
@@ -159,7 +160,7 @@ export default function InventoryAudits() {
     setPendingAction({
       type,
       docId: detailAudit.id,
-      docNumber: detailAudit.id.substring(0, 8),
+      docNumber: detailAudit.number,
       key: generateIdempotencyKey(),
     })
   }
@@ -301,7 +302,7 @@ export default function InventoryAudits() {
         <div className="bg-white border border-[#D4CFC8] p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">{detailAudit.id}</span>
+              <span className="text-[14px] font-mono font-semibold text-[#2B2B2B]">{detailAudit.number}</span>
               <span className="text-[14px] font-semibold text-[#2B2B2B]">{detailAudit.location}</span>
               <span className="text-[12px] text-[#5E5E5E]">{detailAudit.date}</span>
               <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${
@@ -349,7 +350,7 @@ export default function InventoryAudits() {
                           <tr key={idx} className="bg-white hover:bg-[#F6F5F2]">
                             <td className="px-3 py-1.5 text-[12px]">{it.itemName}</td>
                             <td className="px-3 py-1.5 text-[11px] font-mono text-center text-[#5E5E5E]">{it.batchNumber || '—'}</td>
-                            <td className="px-3 py-1.5 text-[12px] text-right font-mono text-[#5E5E5E]">{it.expectedQuantity}</td>
+                            <td className="px-3 py-1.5 text-[12px] text-right font-mono text-[#5E5E5E]">{formatNumber(it.expectedQuantity)}</td>
                             <td className="px-3 py-1.5">
                               <input
                                 type="number"
@@ -396,13 +397,13 @@ export default function InventoryAudits() {
                       {detailAudit.items.map((it, i) => {
                         const diff = it.discrepancy;
                         const diffClass = diff > 0 ? 'text-[#5A8A6E]' : diff < 0 ? 'text-[#C0563F]' : 'text-[#5E5E5E]';
-                        const diffText = diff > 0 ? `+${diff}` : String(diff);
+                        const diffText = diff > 0 ? `+${formatNumber(diff)}` : formatNumber(diff);
                         return (
                           <tr key={i} className="bg-white hover:bg-[#F6F5F2]/50">
                             <td className="px-3 py-2 text-[12px]">{it.materialName}</td>
                             <td className="px-3 py-2 text-[11px] font-mono text-center text-[#5E5E5E]">{it.batchName || '—'}</td>
-                            <td className="px-3 py-2 text-[12px] text-right font-mono">{it.expected}</td>
-                            <td className="px-3 py-2 text-[12px] text-right font-mono">{it.actual}</td>
+                            <td className="px-3 py-2 text-[12px] text-right font-mono">{formatNumber(it.expected)}</td>
+                            <td className="px-3 py-2 text-[12px] text-right font-mono">{formatNumber(it.actual)}</td>
                             <td className={`px-3 py-2 text-[12px] text-right font-mono font-medium ${diffClass}`}>{diffText}</td>
                             <td className="px-3 py-2 text-[11px] text-center text-[#5E5E5E]">{it.unit}</td>
                           </tr>
@@ -471,7 +472,7 @@ export default function InventoryAudits() {
                   className={`h-12 cursor-pointer hover:bg-[#EFEBE6] ${detailId === a.id ? 'bg-[#F6F5F2]' : idx % 2 === 1 ? 'bg-[#F6F5F2]' : 'bg-white'}`}
                   onClick={() => { setDetailId(detailId === a.id ? null : a.id); setCounts([]) }}
                 >
-                  <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{a.id}</td>
+                  <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{a.number}</td>
                   <td className="px-4 text-[12px]">{a.date}</td>
                   <td className="px-4 text-[12px] font-medium">{a.location}</td>
                   <td className="px-4 text-[12px] text-right font-mono">{a.items?.length || 0}</td>

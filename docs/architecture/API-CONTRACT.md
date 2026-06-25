@@ -587,7 +587,7 @@ interface CountInventoryAuditDTO {
         "action": "APPROVE",
         "entityType": "InventoryAudit",
         "entityId": "audit-uuid",
-        "summary": "APPROVE performed on InventoryAudit (audit-uuid)"
+        "summary": "Инвентаризация: утверждение"
       }
     ]
   },

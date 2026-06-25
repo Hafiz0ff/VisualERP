@@ -518,6 +518,13 @@ export class InventoryAuditsService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
+          lines: {
+            include: {
+              item: true,
+              unit: true,
+              batch: true,
+            },
+          },
           location: { select: { id: true, name: true } },
           auditor: { select: { id: true, email: true, firstName: true, lastName: true } },
         },

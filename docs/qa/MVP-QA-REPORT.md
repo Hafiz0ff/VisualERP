@@ -64,7 +64,7 @@ Dashboard Production Completed this month: 1
 Dashboard Shipment count shipped this month: 1
 17. Checking Audit Logs...
 Audit Logs checked successfully.
-Latest activity in logs: APPROVE performed on InventoryAudit (e306e08c-11f7-4456-af35-e2af40345e8a)
+Latest activity in logs: Инвентаризация: утверждение
 === Programmatic E2E Business Workflow Validation PASSED Successfully ===
 ```
 

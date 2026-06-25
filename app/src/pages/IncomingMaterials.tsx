@@ -8,6 +8,7 @@ import { generateIdempotencyKey } from '../api/idempotency'
 import { handleApiError } from '../api/errors'
 import type { Item, StockBalanceRow, PurchaseReceiptDetail, StockLocation, Supplier } from '../api/types'
 import { Plus, X } from 'lucide-react'
+import { formatCurrency, formatNumber } from '@/lib/number-format'
 
 interface InItem {
   materialId: string;
@@ -189,14 +190,14 @@ export default function IncomingMaterials() {
                 <td className="px-3 py-2"><input type="number" value={it.quantity || ''} onChange={(e) => hChange(idx, 'quantity', Number(e.target.value))} className="h-8 w-full px-2 text-[12px] bg-[#F6F5F2] border border-[#D4CFC8] rounded text-center" min="0" step="0.1" /></td>
                 <td className="px-3 py-2 text-center text-[12px] text-[#5E5E5E]">{it.unit || '-'}</td>
                 <td className="px-3 py-2"><input type="number" value={it.pricePerUnit || ''} onChange={(e) => hChange(idx, 'pricePerUnit', Number(e.target.value))} className="h-8 w-full px-2 text-[12px] bg-[#F6F5F2] border border-[#D4CFC8] rounded text-right" /></td>
-                <td className="px-3 py-2 text-[12px] text-right font-mono">{it.total.toLocaleString()}</td>
+                <td className="px-3 py-2 text-[12px] text-right font-mono">{formatNumber(it.total)}</td>
                 <td className="px-3 py-2 text-center">{items.length > 1 && <button type="button" onClick={() => setItems(items.filter((_, j) => j !== idx))} className="text-[#9E9E9E] hover:text-[#C0563F]"><X size={14} /></button>}</td>
               </tr>))}</tbody>
             </table>
           </div>
           <button type="button" onClick={() => setItems([...items, { materialId: '', materialName: '', batchName: '', quantity: 0, unit: '', unitId: '', pricePerUnit: 0, total: 0 }])} className="mb-4 text-[12px] text-[#C0563F] font-medium flex items-center gap-1"><Plus size={12} /> Добавить строку</button>
           <div className="flex items-center justify-between">
-            <div className="text-[12px] text-[#5E5E5E]">Итого: <strong className="text-[#2B2B2B]">{items.reduce((s, it) => s + it.total, 0).toLocaleString()} ₽</strong></div>
+            <div className="text-[12px] text-[#5E5E5E]">Итого: <strong className="text-[#2B2B2B]">{formatCurrency(items.reduce((s, it) => s + it.total, 0))}</strong></div>
             <div className="flex items-center gap-3"><button type="button" onClick={() => setShowForm(false)} className="h-9 px-4 text-[13px] font-medium text-[#5E5E5E] bg-white border border-[#D4CFC8] rounded hover:bg-[#F6F5F2]">Отмена</button><button type="submit" disabled={isSubmitting} className="h-9 px-5 text-[13px] font-medium text-white bg-[#C0563F] rounded hover:bg-[#A84835] disabled:opacity-50">{isSubmitting ? 'Сохранение...' : 'Создать'}</button></div>
           </div>
         </form>
@@ -234,21 +235,21 @@ export default function IncomingMaterials() {
           </tr></thead>
             <tbody className="divide-y divide-[#F6F5F2]">{filtered.slice().reverse().map((d, idx) => (
               <tr key={d.id} className={`h-12 ${idx % 2 === 1 ? 'bg-[#F6F5F2]' : 'bg-white'} hover:bg-[#EFEBE6]`}>
-                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{d.id}</td><td className="px-4 text-[12px]">{d.date}</td>
+                <td className="px-4 text-[12px] font-mono text-[#5E5E5E]">{d.number}</td><td className="px-4 text-[12px]">{d.date}</td>
                 <td className="px-4 text-[12px] font-medium">{d.supplier}</td><td className="px-4 text-[12px] text-[#5E5E5E]">{d.warehouse}</td>
                 <td className="px-4 text-[12px]">{d.items.length} поз.<br/><span className="text-[10px] text-[#9E9E9E]">{d.items.map((it) => it.materialName).join(', ')}</span></td>
-                <td className="px-4 text-[12px] text-right font-mono">{d.totalSum.toLocaleString()} ₽</td>
+                <td className="px-4 text-[12px] text-right font-mono">{formatCurrency(d.totalSum)}</td>
                 <td className="px-4 text-center"><span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${d.status === 'posted' ? 'bg-[#5A8A6E]/15 text-[#5A8A6E]' : d.status === 'draft' ? 'bg-[#F0A830]/15 text-[#F0A830]' : 'bg-[#C0563F]/15 text-[#C0563F]'}`}>{d.status === 'posted' ? 'Проведен' : d.status === 'draft' ? 'Черновик' : 'Отменен'}</span></td>
                 <td className="px-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     {d.status === 'draft' && (
                       <>
-                        <button onClick={() => handleActionClick('post', d.id, d.id.substring(0, 8))} className="text-[11px] text-[#5A8A6E] font-medium hover:underline">Провести</button>
-                        <button onClick={() => handleActionClick('cancel', d.id, d.id.substring(0, 8))} className="text-[11px] text-[#C0563F] font-medium hover:underline">Отменить</button>
+                        <button onClick={() => handleActionClick('post', d.id, d.number)} className="text-[11px] text-[#5A8A6E] font-medium hover:underline">Провести</button>
+                        <button onClick={() => handleActionClick('cancel', d.id, d.number)} className="text-[11px] text-[#C0563F] font-medium hover:underline">Отменить</button>
                       </>
                     )}
                     {d.status === 'posted' && (
-                      <button onClick={() => handleActionClick('cancel', d.id, d.id.substring(0, 8))} className="text-[11px] text-[#C0563F] font-medium hover:underline">Отменить</button>
+                      <button onClick={() => handleActionClick('cancel', d.id, d.number)} className="text-[11px] text-[#C0563F] font-medium hover:underline">Отменить</button>
                     )}
                   </div>
                 </td>
