@@ -165,6 +165,11 @@ Seed заполняет не только справочники, но и жив
 
 ---
 
+### 2.1. Памятка для показа
+В веб-приложение добавлена отдельная красочная инструкция для демонстрации: [app/public/demo-guide.html](app/public/demo-guide.html). При запуске через Docker или временную ссылку Cloudflare она открывается по адресу `/demo-guide.html` и простым языком объясняет, где что находится и как провести показ.
+
+---
+
 ### 3. Запуск E2E авто-теста бизнес-процесса
 В системе присутствует сквозной автоматический скрипт тестирования [verify_e2e.ts](verify_e2e.ts). Он полностью имитирует действия пользователей: делает закупки сырья, перемещения в цех, запускает рецептурное производство, отгружает товар и проводит аудит склада, сверяя балансы в БД на каждом шаге.
 
@@ -340,6 +345,11 @@ The React frontend will be accessible at `http://localhost:5173`.
 
 ### 2. Realistic Demo Data
 The seed script now creates a full demo story, not only dictionaries: raw material receipts, warehouse-to-workshop transfers, production orders in multiple states, finished goods output, shipments, write-offs, inventory audits, stock balances, and audit log events. Re-running the seed clears only operational demo documents for the demo organization and recreates the scenario from scratch.
+
+---
+
+### 2.1. Demo Walkthrough Guide
+The web app includes a standalone visual walkthrough for stakeholders: [app/public/demo-guide.html](app/public/demo-guide.html). In Docker or Cloudflare demo mode it is available at `/demo-guide.html` and explains the demo flow in plain Russian.
 
 ---
 
